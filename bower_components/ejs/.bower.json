@@ -1,0 +1,15 @@
+{
+  "name": "ejs",
+  "homepage": "https://github.com/visionmedia/ejs",
+  "version": "0.8.4",
+  "_release": "0.8.4",
+  "_resolution": {
+    "type": "version",
+    "tag": "0.8.4",
+    "commit": "0c739e1f4c2b7b6093146124cd7e7177937255af"
+  },
+  "_source": "git://github.com/visionmedia/ejs.git",
+  "_target": "~0.8.4",
+  "_originalSource": "ejs",
+  "_direct": true
+}

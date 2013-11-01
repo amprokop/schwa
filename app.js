@@ -7,14 +7,14 @@ var path = require('path');
 
 var app = express();
 
-app.use(express.bodyParser());
-app.use(express.directory('public'));
-app.use(express.static('public'));
 
 app.configure( function(){
   app.set('views', __dirname + '/');
   app.set('view engine', 'handlebars');
   app.set('view options', {layout: false});
+  app.use(express.bodyParser());
+  console.log(__dirname + './public');
+  app.use('/public', express.static(__dirname + '/public'));
 
 });
 
@@ -55,6 +55,8 @@ app.post('/', function(req,res){
 });
 
 app.get('/', function(req,res){
+  console.log("hello");
+  console.log(path.join(__dirname + '.index.html'));
   fs.createReadStream(path.join(__dirname + '/index.html')).pipe(res);
 });
 

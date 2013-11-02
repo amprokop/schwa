@@ -1,29 +1,39 @@
-var AppView = Backbone.View.extend({
+var Flshr = Backbone.View.extend({
 
-  template: Templates['app'],
 
   events: {
-    "click thumbs_up" : "renderNextCard"
-    "click thumbs_side" : "renderNextCard"
-    "click thumbs_down" : "renderNextCard"
+    "click .thumbs_up" : "renderNextCard",
+    "click .thumbs_side" : "renderNextCard",
+    "click .thumbs_down" : "renderNextCard",
+    "click .flipper" : "cardFlip"
   },
 
   initialize: function(){
-    $(body).append(this.render().el);
-    this.router = new Shortly.Router({el: this.$el.find('#cards_container')})
+    // this.currentCardId = 0;
+    $(document.body).append(this.render().el);
+    $('.card_container').html(this.renderDeckView().$el.html());
+    this.router = new Flshr.Router({el: this.$el.find('#cards_container')});
     Backbone.history.start({pushState: true});
   },
 
   render: function(){
-    this.$el.html(this.template());
+    var uncompiledTemplate = $('#app').html();
+    var template = Handlebars.compile(uncompiledTemplate);
+    this.$el.html(template);
     return this;
   },
 
-  renderDeckView: function(e){
-    e && e.preventDefault;
+  renderDeckView: function(){
+    this.deckView = new Flshr.DeckView({el: this.$el.find('.card_container')});
+    return this.deckView;
   },
 
-  next: function(e){
+  renderNextCard: function(e){
+    this.deckView.next();
+  },
+
+  cardFlip: function(){
+    this.deckView.flip();
   }
 
-})
+});

@@ -1,6 +1,6 @@
 body {
   font-family: 'Helvetica';
-  font-size: 20px;
+  font-size: 40px;
   font-weight: bold;
   background-color: black;
   color: white;
@@ -22,8 +22,14 @@ body {
 
 .thumbs {
   border: 1px solid black;
+  margin-top: 20px;
   margin-left: auto;
   margin-right: auto;
+}
+
+img {
+  height:100px;
+  width:100px;
 }
 
 .thumbs_up {
@@ -51,4 +57,16 @@ body {
   -webkit-transform: rotate(180deg); /* Safari and Chrome */
   -o-transform: rotate(180deg); /* Opera */
   -moz-transform: rotate(180deg); /* Firefox */
+}
+
+#hidden {
+  visibility: hidden;
+}
+
+button {
+  width: 8em;
+  height: 3em;
+  background-color: black;
+  color: red;
+  border: 6px solid red;
 }

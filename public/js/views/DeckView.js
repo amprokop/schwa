@@ -29,6 +29,13 @@ Flshr.DeckView = Backbone.View.extend({
   next: function(){
     this.currentCard++;
     this.render(this.currentCard);
+  },
+
+  flip: function(){
+    console.log('hide and seek');
+    console.log($('#hidden').css('visibility'));
+    $('#hidden').css("visibility","visible");
+
   }
 
 });

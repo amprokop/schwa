@@ -1,42 +1,73 @@
 <html>
 <head>
   <script src="public/bower_components/jquery/jquery.js"></script>
+  <script src="public/bower_components/underscore/underscore.js"></script>
   <script src="public/bower_components/backbone/backbone.js"></script>
   <script src="public/bower_components/handlebars/handlebars.js"></script>
-  <script src="public/js/router.js"></script>
-  <script src="public/js/views/appview.js"></script>
-
-
+  <script src="public/bower_components/passport/passport.js"></script>
   <link rel="stylesheet" type="text/css" href="/public/css/cards.css">
-  <script id="app" type="text/x-handlebars-template"></script>
-    <div class="app">
-      <span class="card_count">{{total}}</span>
-      <span class="current_streak">{{current_streak}}</span>
-      <span class="best_streak">{{best_streak}}</span>
+
+</head>
+<body>
+  <a class="sign_out">Sign Out</a>
+
+  <script id="auth" type="text/x-handlebars-template">
+    <div class='top_bar'>
+    User info goes here
     </div>
-    <div class="card_container"></div>
-    <div>
+  </script>
+
+  <script id="decks" type="text/x-handlebars-template">
+    <div class='box'>
+    Decks go here
+    </div>
+  </script>
+
+  <script id="card" type="text/x-handlebars-template">
+    <div class="deck_name">{{deck}}</div>
+    <div class='crd'>
+      <div class='front'>
+        {{front}}
+      </div>
+      <div class ='back' id="hidden">
+        {{back}}
+      </div>
+      <button class="flipper">Flip</button>
+    </div>
+  </script>
+
+
+  <script id="app" type="text/x-handlebars-template">
+    <div class="app">
+      <span class="card_count">Total:</span>
+      <span class="current_streak">Current Streak: {{current_streak}}</span>
+      <span class="best_streak">Best Streak:{{best_streak}}</span>
+      <div class="card_container"></div>
       <div class="thumbs">
         <span class="box"><img class="thumbs_down" src="/public/img/thumbs_up.png"></span>
         <span class="box"><img class="thumbs_side" src="/public/img/thumbs_up.png"></span>
-        <span class-"box"><img class="thumbs_up" src="/public/img/thumbs_up.png"></span>
+        <span class="box"><img class="thumbs_up" src="/public/img/thumbs_up.png"></span>
       </div>
-    </div>
+  </div>
   </script>
-</head>
-<body>
+
+
+  <script src="public/js/views/appview.js"></script>
+  <script src="public/js/views/SettingsView.js"></script>
+  <script src="public/js/views/IndexView.js"></script>
+  <script src="public/js/views/DeckView.js"></script>
+  <script src="public/js/router.js"></script>
+  <script src="public/js/models/Deck.js"></script>
+
   <script>
   $(function(){
     new Flshr();
   });
 
-  window.Templates = {};
 
-  $("[type='text/x-handlebars-template']").each(function(index, div){
-      Templates[div.id] = Handlebars.compile(div.innerHTML);
-  });
   </script>
-<body>
+
+</body>
 </html>
 
 

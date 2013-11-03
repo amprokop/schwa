@@ -1,6 +1,6 @@
-function postCard(front,back){
+function postCard(front, back, deck){
   debugger;
-  var data = {front: front, back: back};
+  var data = {front: front, back: back, deck: deck};
   var url = 'http://localhost:8080/';
   $.ajax({
     url:url,

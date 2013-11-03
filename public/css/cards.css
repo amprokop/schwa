@@ -4,6 +4,7 @@ body {
   font-weight: bold;
   background-color: black;
   color: white;
+  -webkit-font-smoothing: antialiased;
 }
 
 .card_container {
@@ -69,4 +70,10 @@ button {
   background-color: black;
   color: red;
   border: 6px solid red;
+}
+
+.crd {
+  position: relative;
+  top: 35%;
+  bottom: 50%;
 }

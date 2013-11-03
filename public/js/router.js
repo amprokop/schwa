@@ -1,5 +1,5 @@
 Flshr.Router = Backbone.Router.extend({
-  
+
   initialize: function(options){
     this.$el = options.el;
   },
@@ -10,8 +10,8 @@ Flshr.Router = Backbone.Router.extend({
   },
 
   cards: function(){
-    var appView = new Flshr.AppView();
-    this.renderView(appView);
+    // var appView = new Flshr.AppView();
+    // this.renderView(appView);
   },
 
   renderView: function(view){

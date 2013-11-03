@@ -4,12 +4,12 @@ $(function(){
   $('#post').click(function(){postCard();});
 
   function postCard(){
-    debugger;
     var front  = $('#front').val();
     var back = $('#back').val();
+    var deck = $('#deck').val();
     var bg = chrome.extension.getBackgroundPage();
-    bg.postCard(front, back);
-  };
+    bg.postCard(front, back, deck);
+  }
 });
 
 

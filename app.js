@@ -1,6 +1,13 @@
+//Presently, your Chrome extension links to localhost:8080 for its popup. Must change in the build! Don't spend hours figuring this out.
+
+
 var express = require('express');
-var mongoose = require('mongoose');
+var mongoose = require('mongoose'),
+    Schema = mongoose.Schema;
+
 var fs = require('fs');
+var url = require('url');
+var querystring = require('querystring');
 var handlebars = require('handlebars');
 var consolidate = require('consolidate');
 var path = require('path');
@@ -15,7 +22,6 @@ app.configure( function(){
   app.use(passport.initialize());
   app.use(passport.session());
   app.use(express.cookieParser());
-  console.log(__dirname + './public');
   app.use('/public', express.static(__dirname + '/public'));
   app.set('views', __dirname + '/');
   app.set('view engine', 'handlebars');
@@ -81,6 +87,10 @@ passport.deserializeUser(function(_id, done){
 
 
 
+
+
+
+
 //DATABASE SETUP
 
 mongoose.connect('mongodb://localhost/flshr');
@@ -92,34 +102,46 @@ db.once('open', function callback(){
 
 var cardSchema = mongoose.Schema({
   front: String,
-  back: String,//,
-  deck: String
-  //user:
-  //collection: String,
-  //source_URL: String,
-  // reviews: Number,
-  // pushed_up: Boolean,
-  // pushed_down: Boolean,
-  // created_at: { type: String, default: (new Date()).getTime() }
+  back: String,
+  deckname: String,
+  URL: String,
+  _creator: {type: Schema.Types.ObjectId, ref: 'User'}//,
+  // decks: [{type: Schema.Types.ObjectId, ref: 'Deck'}]
+  //REMOVED FOR NOW: is it necessary for the card to have  a reference to its containing deck?
+  //the problem is--when we make a new card, if we want to save a reference to the deck we would...
+  // first have to find the deck or make a new one, then save its id
+  //THEN make the card
+  //THEN return to the deck and save the card's ID.
+  //this costs us three trips to the server.. is there a way to streamline this process?
 });
+
+var superMemo = mongoose.Schema({
+  _cardid: {type: Schema.Types.ObjectId, ref: 'Card'},
+  _userid: {type: Schema.Types.ObjectId, ref: 'User'},
+  interval: Number,
+  count: Number
+});
+//Not used yet----- need to implement user authentication first.
 
 var userSchema = mongoose.Schema({
   firstname: String,
   lastname: String,
   email: String,
   accounts: [],
-  decks: []
+  decks: [{type: Schema.Types.ObjectId, ref: 'Deck'}]
 });
 
 var deckSchema = mongoose.Schema({
   deckname: String,
-  cards: []
+  cards: [{type: Schema.Types.ObjectId, ref: 'Card' }],
+  _creator: [{type: Schema.Types.ObjectId, ref: 'User'}]
 });
 
 
 var User = mongoose.model('User', userSchema);
 var Card = mongoose.model('Card', cardSchema);
 var Deck = mongoose.model('Deck', deckSchema);
+
 
 
 
@@ -147,54 +169,87 @@ app.get('/auth/facebook/callback',
   passport.authenticate('facebook', { successRedirect: '/index',
                                       failureRedirect: '/' }));
 
+app.get('/popup/auth/facebook', passport.authenticate('facebook'));
+
+// Facebook will redirect the user to this URL after approval.  Finish the
+// authentication process by attempting to obtain an access token.  If
+// access was granted, the user will be logged in.  Otherwise,
+// authentication has failed.
+app.get('/popup/auth/facebook/callback',
+  passport.authenticate('facebook', { successRedirect: '/chrome',
+                                      failureRedirect: '/' }));
+
+
+
+
+
+
+
+
 
 
 //APP ROUTES
 
-app.post('/', function(req,res){
-  var card = new Card({front: req.body.front, back: req.body.back, deck:req.body.deck});
-  var newCardID;
+app.post('/chrome', function(req,res){
+  console.log('posted to /');
+
+  var card = new Card({front: req.body.front, back: req.body.back, deckname:req.body.deckname});
   card.save(function(err, card){
     if (err){
       console.log(err);
-    } else{
-      console.log(card);
-      newCardID = card._id;
+    } else {
+      console.log("New card created: " + card);
     }
   });
+//GOAL: add user to card
 
-  console.log("the new card's unique ID is: " + card._id);
-
-  Deck.findOne({deckname:req.body.deck}, function(err,existingDeck){
-    if(existingDeck){
-      console.log('adding to existing deck: ' + req.body.deck);
-      existingDeck.cards.push(newCardID);
+  Deck.findOne({deckname:req.body.deck}, function(err,deck){
+    if(deck){
+      console.log('adding to existing deck: ' + deck.deckname);
+      deck.cards.push(card._id);
+      console.log(deck.cards);
+      deck.save();
+      console.log('now the existing deck is:' + deck);
     } else {
       var newDeck = new Deck({deckname:req.body.deck});
-      console.log('new deck created with name: ' + req.body.deck);
-      newDeck.cards.push(newCardID);
-      console.log('card pushed to deck');
-      console.log(newDeck);
-      console.log(newCardID);
-
+      console.log('new deck created with name: ' + newDeck.deckname);
+      newDeck.cards.push(card._id);
       newDeck.save(function(err,deck){
         if (err){
           console.log(err);
         } else {
-          console.log(deck);
+          console.log("New deck created: " + deck);
         }
       });
     }
   });
-
+//add _creator to deck
   console.log(card.front, card.back);
   res.send(req.body.self);
 });
 
 app.get('/', function(req,res){
-  console.log('/');
   fs.createReadStream(path.join(__dirname + '/signin.html')).pipe(res);
 });
+
+app.get('/chrome/new_card/', function(req,res){
+  fs.createReadStream(path.join(__dirname + '/chrome.html')).pipe(res);
+});
+
+
+app.get('/chrome/', function(req,res){
+  fs.createReadStream(path.join(__dirname + '/chrome.html')).pipe(res);
+});
+
+app.get('/chrome/new_card/*', function(req,res){
+    var query = url.parse(req.url).query;
+    if(query){
+      var text = querystring.parse(query).text;
+      console.log(querystring.parse(query).text);
+    }
+  fs.createReadStream(path.join(__dirname + '/chrome.html')).pipe(res);
+});
+
 
 app.get('/index', function(req,res){
   fs.createReadStream(path.join(__dirname + '/index.html')).pipe(res);
@@ -206,6 +261,25 @@ app.get('/deck', function(req, res){
   });
 });
 
+app.get('/decks', function(req, res){
+  Deck.find(function(err, decks){
+    res.send(decks);
+  });
+});
+
+app.get('/decks/*', function(req, res){
+  // res.send('searching for deck with id: ' + req.params[0])
+  var deckID = req.params[0];
+  Deck.findOne({_id: deckID})
+    .populate('cards')
+    .exec(function(err, deck){
+      if (err) {
+        console.log('there was an error', err, deck);
+      } else {
+        res.send(deck.cards);
+      }
+    });
+});
 
 
 

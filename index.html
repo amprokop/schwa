@@ -8,8 +8,11 @@
   <link rel="stylesheet" type="text/css" href="/public/css/cards.css">
 
 </head>
-<body>
+
+
   <a class="sign_out">Sign Out</a>
+
+
 
   <script id="auth" type="text/x-handlebars-template">
     <div class='top_bar'>
@@ -18,13 +21,11 @@
   </script>
 
   <script id="decks" type="text/x-handlebars-template">
-    <div class='box'>
-    Decks go here
-    </div>
+      <div class="dck {{deckID}}">{{deckname}}</div>
   </script>
 
   <script id="card" type="text/x-handlebars-template">
-    <div class="deck_name">{{deck}}</div>
+  <div class='deckname'>{{deckname}}</div>
     <div class='crd'>
       <div class='front'>
         {{front}}
@@ -36,10 +37,9 @@
     </div>
   </script>
 
-
   <script id="app" type="text/x-handlebars-template">
     <div class="app">
-      <span class="card_count">Total:</span>
+      <span class="deck_list">Deck List</span>
       <span class="current_streak">Current Streak: {{current_streak}}</span>
       <span class="best_streak">Best Streak:{{best_streak}}</span>
       <div class="card_container"></div>
@@ -52,21 +52,22 @@
   </script>
 
 
-  <script src="public/js/views/appview.js"></script>
+  <script src="public/js/views/AppView.js"></script>
   <script src="public/js/views/SettingsView.js"></script>
   <script src="public/js/views/IndexView.js"></script>
   <script src="public/js/views/DeckView.js"></script>
   <script src="public/js/router.js"></script>
   <script src="public/js/models/Deck.js"></script>
+  <script src="public/js/models/Decks.js"></script>
 
   <script>
   $(function(){
     new Flshr();
   });
 
-
   </script>
 
+<body>
 </body>
 </html>
 

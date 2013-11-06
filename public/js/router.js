@@ -1,12 +1,10 @@
 Flshr.Router = Backbone.Router.extend({
 
-  initialize: function(options){
-    this.$el = options.el;
-  },
 
   routes: {
     "": "cards",
-    "settings" : "settings"
+    "settings" : "settings",
+    // "*" : "deckview"
   },
 
   cards: function(){

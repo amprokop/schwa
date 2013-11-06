@@ -1,31 +1,58 @@
+// var Flshr = {};
+// _.extend(Flshr, Backbone.Events);
+
+// Flshr.AppView = Backbone.View.extend({
+
 var Flshr = Backbone.View.extend({
 
+
+//Is it better to make a single call that grabs all the data from the server 
+//when a new session is created?
+//In that case, should I be instantiating the model in the AppView?
 
   events: {
     "click .thumbs_up" : "renderNextCard",
     "click .thumbs_side" : "renderNextCard",
     "click .thumbs_down" : "renderNextCard",
-    "click .flipper" : "cardFlip"
+    "click .flipper" : "cardFlip",
+    "click .deck_list" : "renderIndexView"
   },
 
   initialize: function(){
-    // this.currentCardId = 0;
+    var uncompiledTemplate = $('#app').html();
+    this.template = Handlebars.compile(uncompiledTemplate);
+
     $(document.body).append(this.render().el);
-    $('.card_container').html(this.renderDeckView().$el.html());
-    this.router = new Flshr.Router({el: this.$el.find('#cards_container')});
+    this.renderIndexView();
+    // $('.card_container').html(this.renderDeckView().$el.html());
+    // this.router = new Flshr.Router({el: this.$el.find('#cards_container')});
+    // Not using a router at the moment. Would a router be helpful here?
     Backbone.history.start({pushState: true});
   },
 
   render: function(){
-    var uncompiledTemplate = $('#app').html();
-    var template = Handlebars.compile(uncompiledTemplate);
-    this.$el.html(template);
+    this.$el.html(this.template);
+    this.$cardContainer = this.$el.find('.card_container');
     return this;
   },
 
-  renderDeckView: function(){
-    this.deckView = new Flshr.DeckView({el: this.$el.find('.card_container')});
+  switch_deck: function(e){
+    var getURL = "decks/" + e;
+    this.renderDeckView(e);
+    this.deckView.trigger('deck_change', getURL);
+  },
+
+  renderDeckView: function(e){
+    this.deckView = new Flshr.DeckView({el: this.$cardContainer});
     return this.deckView;
+  },
+
+  renderIndexView: function(){
+    var that = this;
+    // this.$el.find('.card_container').empty();
+    this.indexView = new Flshr.IndexView({el: this.$cardContainer});
+    this.listenTo(this.indexView, "deck_render", this.switch_deck);
+    //Is the body of a function a bad place for a listener??
   },
 
   renderNextCard: function(e){
@@ -35,5 +62,6 @@ var Flshr = Backbone.View.extend({
   cardFlip: function(){
     this.deckView.flip();
   }
+
 
 });

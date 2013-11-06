@@ -64,7 +64,7 @@ img {
   visibility: hidden;
 }
 
-button {
+.flipper {
   width: 8em;
   height: 3em;
   background-color: black;
@@ -76,4 +76,27 @@ button {
   position: relative;
   top: 35%;
   bottom: 50%;
+}
+
+
+.dck {
+  position: relative;
+  top: 15%;
+  bottom: 50%;
+}
+
+
+.decks {
+  margin-bottom: 2em;
+  margin-right: 1em;
+  width: 24em;
+  height: 6em;
+  background-color: black;
+  color: red;
+  border: 6px solid red;
+}
+
+.deckname {
+  top: 2em;
+  font-size: 20px;
 }

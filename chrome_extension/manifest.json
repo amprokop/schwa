@@ -1,0 +1,26 @@
+{
+  "name": "Remindr",
+  "description": "This extension lets users easily create flashcards.",
+  "version": "1.0",
+  "manifest_version": 2,
+
+  "background": {
+    // "page": "background.html",
+    "scripts" : ["background.js", "card_popup.js"]
+  },
+
+  "permissions": [
+    "tabs",
+    "contextMenus"
+    // "http://localhost:8080/"
+  ],
+
+  "icons" : {
+    "16" : "icon_small.png"
+  },
+
+  "browser_action" : {
+    "default_title" : "Remindr",
+    "default_icon": "icon.png"
+  }
+}

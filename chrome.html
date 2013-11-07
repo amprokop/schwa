@@ -1,14 +1,8 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
-<head>
-  <title>Remindr</title>
-  <script src="public/bower_components/jquery/jquery.js"></script>
-  <script src="public/js/card_popup.js"></script>
-  <link rel="stylesheet" type="text/css" href="style.css">
-</head>
   <body>
   <form action="/new_card/" method="post">
-      Front: <input type="text" name="front"/><br>
+      Front: <input type="text" name="front" value={{selectedText}}/><br>
       Back: <input type="text" name="back"/><br>
       Deck: <input type="text" name="deck"/><br>
       <input type="submit" name="submit" value="Save" />
@@ -19,4 +13,3 @@
   </form>
 </body>
 </html>
-

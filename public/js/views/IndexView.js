@@ -25,9 +25,11 @@ Flshr.IndexView = Backbone.View.extend({
   render: function(){
     var that = this;
     this.$el.empty();
+
     this.decks.each(function(deck){
       var deckname = deck.attributes.deckname;
       var deckID = deck.attributes._id;
+      var deckLength = deck.collection.length;
       var uncompiledTemplate = $('#decks').html();
       var template = Handlebars.compile(uncompiledTemplate);
       var context = {deckname: deckname, deckID: deckID};

@@ -1,6 +1,5 @@
 //Presently, your Chrome extension links to localhost:8080 for its popup. Must change in the build! Don't spend hours figuring this out.
 
-
 var express = require('express');
 var mongoose = require('mongoose'),
     Schema = mongoose.Schema;
@@ -19,14 +18,30 @@ var app = express();
 
 app.configure( function(){
   app.use(express.bodyParser());
+  app.use(express.cookieParser("cf5bf14d9607347dcb7f5fe9dee2dc6c"));
+  app.use(express.cookieSession());
   app.use(passport.initialize());
-  app.use(passport.session());
-  app.use(express.cookieParser());
+  app.use(passport.session({secret: 'cf5bf14d9607347dcb7f5fe9dee2dc6c', cookie: {maxAge: 60000}}));
   app.use('/public', express.static(__dirname + '/public'));
   app.set('views', __dirname + '/');
   app.set('view engine', 'handlebars');
   app.set('view options', {layout: false});
 });
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
@@ -43,7 +58,7 @@ passport.use(new FacebookStrategy({
 
     User.findOne({'accounts.uid': profile.id, 'accounts.provider':'facebook'}, function(err, existingUser) {
       if(existingUser){
-        console.log("Existing user: " + existingUser.firstname + " "  + existingUser.lastname + "found and logged in." );
+        console.log("Existing user: " + existingUser.firstname + " "  + existingUser.lastname + " found and logged in." );
         done(null, existingUser);
       } else {
         var newUser = new User();
@@ -73,7 +88,6 @@ passport.use(new FacebookStrategy({
 //   }
 // ));
 
-
 passport.serializeUser(function(user,done){
   done(null, user._id);
 });
@@ -83,6 +97,15 @@ passport.deserializeUser(function(_id, done){
     done(err,user);
   });
 });
+
+
+
+
+
+
+
+
+
 
 
 
@@ -149,6 +172,14 @@ var Deck = mongoose.model('Deck', deckSchema);
 
 
 
+
+
+
+
+
+
+
+
 //AUTHENTICATION ROUTES
 
 app.get('/auth/google', passport.authenticate('google'));
@@ -169,13 +200,17 @@ app.get('/auth/facebook/callback',
   passport.authenticate('facebook', { successRedirect: '/index',
                                       failureRedirect: '/' }));
 
-app.get('/popup/auth/facebook', passport.authenticate('facebook'));
+
+
+
+
+app.get('/extension/auth/facebook', passport.authenticate('facebook'));
 
 // Facebook will redirect the user to this URL after approval.  Finish the
 // authentication process by attempting to obtain an access token.  If
 // access was granted, the user will be logged in.  Otherwise,
 // authentication has failed.
-app.get('/popup/auth/facebook/callback',
+app.get('/extension/auth/facebook/callback',
   passport.authenticate('facebook', { successRedirect: '/chrome',
                                       failureRedirect: '/' }));
 
@@ -188,10 +223,20 @@ app.get('/popup/auth/facebook/callback',
 
 
 
+
+
+
+
+
+
 //APP ROUTES
 
-app.post('/chrome', function(req,res){
-  console.log('posted to /');
+app.post('/new_card/', function(req,res){
+  if (!req.user){
+    res.redirect('/extension-login');
+  }
+
+  console.log('posted to / by ~~~~~', req.user);
 
   var card = new Card({front: req.body.front, back: req.body.back, deckname:req.body.deckname});
   card.save(function(err, card){
@@ -203,7 +248,8 @@ app.post('/chrome', function(req,res){
   });
 //GOAL: add user to card
 
-  Deck.findOne({deckname:req.body.deck}, function(err,deck){
+
+  var deck = Deck.findOne({deckname:req.body.deck}, function(err,deck){
     if(deck){
       console.log('adding to existing deck: ' + deck.deckname);
       deck.cards.push(card._id);
@@ -223,13 +269,23 @@ app.post('/chrome', function(req,res){
       });
     }
   });
+
+
+console.log("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n deck", deck);
+console.log("\n\n\n\n\n\n\n\n\\ user", req.user);
+
 //add _creator to deck
-  console.log(card.front, card.back);
   res.send(req.body.self);
 });
 
+
 app.get('/', function(req,res){
   fs.createReadStream(path.join(__dirname + '/signin.html')).pipe(res);
+});
+
+app.get('/logout', function(req, res){
+  req.logout();
+  res.redirect('/');
 });
 
 app.get('/chrome/new_card/', function(req,res){
@@ -237,37 +293,68 @@ app.get('/chrome/new_card/', function(req,res){
 });
 
 
+app.get('/extension-login', function(req,res){
+  fs.createReadStream(path.join(__dirname + '/extension-signin.html')).pipe(res);
+});
+
 app.get('/chrome/', function(req,res){
+  if (!req.user){
+    res.redirect('/extension-login');
+  }
   fs.createReadStream(path.join(__dirname + '/chrome.html')).pipe(res);
 });
 
 app.get('/chrome/new_card/*', function(req,res){
-    var query = url.parse(req.url).query;
-    if(query){
-      var text = querystring.parse(query).text;
-      console.log(querystring.parse(query).text);
-    }
-  fs.createReadStream(path.join(__dirname + '/chrome.html')).pipe(res);
+  if (!req.user){
+    res.redirect('/extension-login');
+  }
+  var query = url.parse(req.url).query;
+  var selectedText = querystring.parse(query).text;
+
+  var source = {
+    selectedText : selectedText
+  };
+
+  var uncompiledTemplate  = fs.readFileSync(path.join(__dirname + '/chrome.html'), "utf8");
+  var template = handlebars.compile(uncompiledTemplate);
+  var populatedTemplate = template(source);
+  res.write(populatedTemplate);
+  // fs.createReadStream(path.join(__dirname + '/chrome.html'))pipe(res);
+  // res.send(selectedText);
 });
 
 
 app.get('/index', function(req,res){
+  if (!req.user){
+    res.redirect('/');
+  }
+  console.log(req.user);
   fs.createReadStream(path.join(__dirname + '/index.html')).pipe(res);
 });
 
 app.get('/deck', function(req, res){
+  if (!req.user){
+    res.redirect('/');
+  }
   Card.find(function(err, cards){
     res.send(cards);
   });
 });
 
 app.get('/decks', function(req, res){
+  console.log("deck", req.user);
+  if (!req.user){
+    res.redirect('/');
+  }
   Deck.find(function(err, decks){
     res.send(decks);
   });
 });
 
 app.get('/decks/*', function(req, res){
+  if (!req.user){
+    res.redirect('/');
+  }
   // res.send('searching for deck with id: ' + req.params[0])
   var deckID = req.params[0];
   Deck.findOne({_id: deckID})

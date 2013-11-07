@@ -1,10 +1,17 @@
-<!DOCTYPE html>
 <html>
   <body>
   <form action="/new_card/" method="post">
-      Front: <input type="text" name="front" value={{selectedText}}/><br>
-      Back: <input type="text" name="back"/><br>
-      Deck: <input type="text" name="deck"/><br>
+    Inspect ya deck:
+    <select id="deckChooser">
+    {{#each decks}}
+    <option> {{this.deckname}}</option>
+    {{/each}}
+    </select><br>
+    Or make a new one: <input type="text" name="deckname"/><br>
+      Front: 
+      <input type="text" name="front" value="{{selectedText}}"/><br>
+      Back: 
+      <input type="text" name="back"/><br>
       <input type="submit" name="submit" value="Save" />
   </form>
   <form>
@@ -12,4 +19,6 @@
     <input type="checkbox" name="vehicle" value="Car">Include source URL
   </form>
 </body>
+</script>
 </html>
+

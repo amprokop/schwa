@@ -238,7 +238,7 @@ app.post('/new_card/', function(req,res){
 
   console.log('posted to / by ~~~~~', req.user);
 
-  var card = new Card({front: req.body.front, back: req.body.back, deckname:req.body.deckname});
+  var card = new Card({front: req.body.front, back: req.body.back, deckname:req.body.deck});
   card.save(function(err, card){
     if (err){
       console.log(err);
@@ -248,15 +248,15 @@ app.post('/new_card/', function(req,res){
   });
 //GOAL: add user to card
 
-
   var deck = Deck.findOne({deckname:req.body.deck}, function(err,deck){
-    if(deck){
-      console.log('adding to existing deck: ' + deck.deckname);
-      deck.cards.push(card._id);
-      console.log(deck.cards);
-      deck.save();
-      console.log('now the existing deck is:' + deck);
-    } else {
+  //from here to 258 is slated for removal.  
+    // if(deck){
+    //   console.log('adding to existing deck: ' + deck.deckname);
+    //   deck.cards.push(card._id);
+    //   console.log(deck.cards);
+    //   deck.save();
+    //   console.log('now the existing deck is:' + deck);
+    // } else {
       var newDeck = new Deck({deckname:req.body.deck});
       console.log('new deck created with name: ' + newDeck.deckname);
       newDeck.cards.push(card._id);
@@ -265,16 +265,18 @@ app.post('/new_card/', function(req,res){
           console.log(err);
         } else {
           console.log("New deck created: " + deck);
+          User.findOne({_id: req.user._id}, function(err,user){
+            user.decks.push(newDeck._id);
+            user.save(function(err,deck){
+              console.log(err);
+              console.log(user.decks);
+            });
+          });
         }
       });
-    }
+    // }
   });
 
-
-console.log("\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n deck", deck);
-console.log("\n\n\n\n\n\n\n\n\\ user", req.user);
-
-//add _creator to deck
   res.send(req.body.self);
 });
 
@@ -297,20 +299,32 @@ app.get('/extension-login', function(req,res){
   fs.createReadStream(path.join(__dirname + '/extension-signin.html')).pipe(res);
 });
 
-app.get('/chrome/', function(req,res){
+app.get('/chrome', function(req,res){
   if (!req.user){
     res.redirect('/extension-login');
   }
+  // Deck.find(function(err, decks){
+  //   console.log(decks);
+  //   var uncompiledTemplate  = fs.readFileSync(path.join(__dirname + '/chrome.html'), "utf8");
+  //   var template = handlebars.compile(uncompiledTemplate);
+  //   var populatedTemplate = template(decks);
+  //   console.log(populatedTemplate);
+  //   // res.write(populatedTemplate);
+  //   // res.write("hello")
+  // });
   fs.createReadStream(path.join(__dirname + '/chrome.html')).pipe(res);
 });
 
 app.get('/chrome/new_card/*', function(req,res){
+//The selected text gets cut off after the first word. I suspect it's because of the spaces. 
+//Must convert the 
+
   if (!req.user){
     res.redirect('/extension-login');
   }
   var query = url.parse(req.url).query;
   var selectedText = querystring.parse(query).text;
-
+  console.log(selectedText);
   var source = {
     selectedText : selectedText
   };
@@ -318,6 +332,7 @@ app.get('/chrome/new_card/*', function(req,res){
   var uncompiledTemplate  = fs.readFileSync(path.join(__dirname + '/chrome.html'), "utf8");
   var template = handlebars.compile(uncompiledTemplate);
   var populatedTemplate = template(source);
+  console.log(populatedTemplate);
   res.write(populatedTemplate);
   // fs.createReadStream(path.join(__dirname + '/chrome.html'))pipe(res);
   // res.send(selectedText);
@@ -367,6 +382,61 @@ app.get('/decks/*', function(req, res){
       }
     });
 });
+
+app.get('/user/decks', function(req, res){
+    if (!req.user){
+    res.redirect('/');
+    }
+
+    User.findOne({_id: req.user._id})
+      .populate('decks')
+      .exec(function(err, user){
+        if (err) {
+          console.log('there was an error', err, deck);
+        } else {
+          res.send(user.decks);
+        }
+      });
+
+//We need to retrieve pertinent information from the deck for each 
+    // User.findOne({_id: userID})
+    //   .populate('decks')
+    //   .exec(function(err, user){
+    //     if (err) {
+    //       console.log('there was an error', err, deck);
+    //     } else {
+    //       user.decks.each
+    //       .populate('cards')
+    //       .exec(function(err,deck){}
+    //     }
+    //   })
+});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

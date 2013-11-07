@@ -1,13 +1,15 @@
 <html>
   <body>
+  <a href="/chrome/logout" class="sign_out">Sign Out</a>
   <form action="/new_card/" method="post">
     Inspect ya deck:
-    <select id="deckChooser">
-    {{#each decks}}
-    <option> {{this.deckname}}</option>
-    {{/each}}
+    <select name="existingDeck" id="deckChooser">
+      <option value="">Inspect ya deck</option>
+      {{#each decks}}
+      <option value="{{this._id}}%%%{{this.deckname}}"> {{this.deckname}}</option>
+      {{/each}}
     </select><br>
-    Or make a new one: <input type="text" name="deckname"/><br>
+    Or make a new one: <input type="text" name="newDeckName"/><br>
       Front: 
       <input type="text" name="front" value="{{selectedText}}"/><br>
       Back: 
@@ -21,4 +23,12 @@
 </body>
 </script>
 </html>
+
+<!-- ADD HTML5 FORM VALIDATION. 
+  The %%% is a ghetto solution. If a deckname includes %%%, it will break. Find another.
+we need a deckname (no empty string), 
+we need a value for front, 
+and we need some place to store the URL?
+Also, toggle between the new deck and dropdown -->
+
 

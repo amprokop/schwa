@@ -1,3 +1,3 @@
 Flshr.Decks = Backbone.Collection.extend({
-  url: '/decks'
+  url: '/user/decks'
 });

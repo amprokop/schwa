@@ -1,4 +1,6 @@
 //Presently, your Chrome extension links to localhost:8080 for its popup. Must change in the build! Don't spend hours figuring this out.
+//The extension's logout button is broken. When logging out and signing back in through the extension, you're redirected to the index page
+
 
 var express = require('express');
 var mongoose = require('mongoose'),
@@ -13,25 +15,21 @@ var path = require('path');
 var passport = require('passport'),
     GoogleStrategy = require('passport-google').Strategy,
     FacebookStrategy = require('passport-facebook').Strategy;
+var keys = require('./keys.js');
 
 var app = express();
 
 app.configure( function(){
   app.use(express.bodyParser());
-  app.use(express.cookieParser("cf5bf14d9607347dcb7f5fe9dee2dc6c"));
+  app.use(express.cookieParser(keys.facebook));
   app.use(express.cookieSession());
   app.use(passport.initialize());
-  app.use(passport.session({secret: 'cf5bf14d9607347dcb7f5fe9dee2dc6c', cookie: {maxAge: 60000}}));
+  app.use(passport.session({secret: keys.facebook, cookie: {maxAge: 60000}}));
   app.use('/public', express.static(__dirname + '/public'));
   app.set('views', __dirname + '/');
   app.set('view engine', 'handlebars');
   app.set('view options', {layout: false});
 });
-
-
-
-
-
 
 
 
@@ -212,7 +210,7 @@ app.get('/extension/auth/facebook', passport.authenticate('facebook'));
 // authentication has failed.
 app.get('/extension/auth/facebook/callback',
   passport.authenticate('facebook', { successRedirect: '/chrome',
-                                      failureRedirect: '/' }));
+                                      failureRedirect: '/extension-login' }));
 
 
 
@@ -231,14 +229,30 @@ app.get('/extension/auth/facebook/callback',
 
 //APP ROUTES
 
+
+
+/*TODO: At the moment, if the user has selected a deck from the dropdown, the card will be
+placed into that deck, even if there is a value in the New Deck box. Change that.  */
+
 app.post('/new_card/', function(req,res){
   if (!req.user){
     res.redirect('/extension-login');
   }
 
-  console.log('posted to / by ~~~~~', req.user);
+  var front = req.body.front, back = req.body.back, deckname, deckId;
+  if (req.body.existingDeck !== ""){
+    //Can we just use falsey values?
+    var deckInfo = req.body.existingDeck.split("%%%");
+    deckId = deckInfo[0];
+    deckname = deckInfo[1];
+    console.log("\n\n\n\n\n\nID, INFO", deckId, deckname);
+  } else {
+    deckname = req.body.newDeckName;
+  }
 
-  var card = new Card({front: req.body.front, back: req.body.back, deckname:req.body.deck});
+//TODO: add _creator to card?
+
+  var card = new Card({front: front, back: back, deckname: deckname});
   card.save(function(err, card){
     if (err){
       console.log(err);
@@ -246,39 +260,37 @@ app.post('/new_card/', function(req,res){
       console.log("New card created: " + card);
     }
   });
-//GOAL: add user to card
-
-  var deck = Deck.findOne({deckname:req.body.deck}, function(err,deck){
-  //from here to 258 is slated for removal.  
-    // if(deck){
-    //   console.log('adding to existing deck: ' + deck.deckname);
-    //   deck.cards.push(card._id);
-    //   console.log(deck.cards);
-    //   deck.save();
-    //   console.log('now the existing deck is:' + deck);
-    // } else {
-      var newDeck = new Deck({deckname:req.body.deck});
-      console.log('new deck created with name: ' + newDeck.deckname);
+//An async problem may exist here. If the Deck query starts before the Card query returns, card._id will be undefined.
+  if(deckId){
+    Deck.findOne({_id: deckId}, function(err,deck){
+      console.log('DeckID', deckId, '\n\n\n\n\n\n\n\n\n\n\n\n\nDeck', deck);
+      deck.cards.push(card._id);
+      deck.save();
+      console.log('Card pushed to existing deck ', deck.deckname);
+    });
+  } else {
+    var newDeck = new Deck({deckname:deckname});
       newDeck.cards.push(card._id);
       newDeck.save(function(err,deck){
         if (err){
           console.log(err);
         } else {
-          console.log("New deck created: " + deck);
+          console.log("New deck created with name: " + deck.deckname);
+          console.log("Now pushing to the current user " + req.user._id + "s decks");
           User.findOne({_id: req.user._id}, function(err,user){
             user.decks.push(newDeck._id);
+            console.log("User found! Here are the new decks:" + user.decks);
             user.save(function(err,deck){
-              console.log(err);
-              console.log(user.decks);
             });
           });
         }
       });
-    // }
-  });
-
+    }
   res.send(req.body.self);
+
 });
+
+
 
 
 app.get('/', function(req,res){
@@ -288,6 +300,11 @@ app.get('/', function(req,res){
 app.get('/logout', function(req, res){
   req.logout();
   res.redirect('/');
+});
+
+app.get('/chrome/logout', function(req, res){
+  req.logout();
+  res.redirect('/extension-login');
 });
 
 app.get('/chrome/new_card/', function(req,res){
@@ -303,39 +320,38 @@ app.get('/chrome', function(req,res){
   if (!req.user){
     res.redirect('/extension-login');
   }
-  // Deck.find(function(err, decks){
-  //   console.log(decks);
-  //   var uncompiledTemplate  = fs.readFileSync(path.join(__dirname + '/chrome.html'), "utf8");
-  //   var template = handlebars.compile(uncompiledTemplate);
-  //   var populatedTemplate = template(decks);
-  //   console.log(populatedTemplate);
-  //   // res.write(populatedTemplate);
-  //   // res.write("hello")
-  // });
-  fs.createReadStream(path.join(__dirname + '/chrome.html')).pipe(res);
+  Deck.find(function(err, decks){
+    var source = {
+      decks : decks
+    };
+    var uncompiledTemplate  = fs.readFileSync(path.join(__dirname + '/chrome.html'), "utf8");
+    var template = handlebars.compile(uncompiledTemplate);
+    var populatedTemplate = template(source);
+    res.write(populatedTemplate);
+  });
 });
 
-app.get('/chrome/new_card/*', function(req,res){
-//The selected text gets cut off after the first word. I suspect it's because of the spaces. 
-//Must convert the 
 
+
+app.get('/chrome/new_card/*', function(req,res){
   if (!req.user){
     res.redirect('/extension-login');
   }
-  var query = url.parse(req.url).query;
-  var selectedText = querystring.parse(query).text;
-  console.log(selectedText);
-  var source = {
-    selectedText : selectedText
-  };
-
-  var uncompiledTemplate  = fs.readFileSync(path.join(__dirname + '/chrome.html'), "utf8");
-  var template = handlebars.compile(uncompiledTemplate);
-  var populatedTemplate = template(source);
-  console.log(populatedTemplate);
-  res.write(populatedTemplate);
-  // fs.createReadStream(path.join(__dirname + '/chrome.html'))pipe(res);
-  // res.send(selectedText);
+  Deck.find(function(err, decks){
+    var query = url.parse(req.url).query;
+    var selectedText = querystring.parse(query).text;
+    var selectedText = querystring.parse(query).url;
+    var source = {
+      selectedText : selectedText,
+      decks : decks,
+      url : url
+    };
+    var uncompiledTemplate  = fs.readFileSync(path.join(__dirname + '/chrome.html'), "utf8");
+    var template = handlebars.compile(uncompiledTemplate);
+    var populatedTemplate = template(source);
+    console.log(populatedTemplate);
+    res.write(populatedTemplate);
+  });
 });
 
 

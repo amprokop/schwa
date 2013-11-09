@@ -412,25 +412,14 @@ app.get('/decks/*', function(req, res){
   if (!req.user){
     res.redirect('/');
   }
-  // res.send('searching for deck with id: ' + req.params[0])
-  var deckId = req.params[0];
-  Deck.findOne({_id: deckId})
-    .populate('cards')
-    .exec(function(err, deck){
-      if (err) {
-        console.log('there was an error', err, deck);
-      } else {
-        User.findOne({_id: req.user._id})
-          .populate({
-            path:'memos',
-            match: {_deckid: deck._id}
-          })
-          .exec(function(err, user){
-            var deckMemos = user.memos;
-            var deckCards = deck.cards;
-            res.send([deckMemos, deckCards]);
-          });
-        }
+  var deckid = req.params[0];
+  //find the memos from that user
+  //populate the _cardid path with the card data of cards matching the requested deck id, then return them
+  Memo.find({_userid: req.user._id})
+    .where('_deckid').equals(deckid)
+    .populate('_cardid')
+    .exec(function(err,memos){
+      res.send(memos);
     });
 });
 

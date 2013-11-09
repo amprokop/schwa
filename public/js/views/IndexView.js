@@ -24,17 +24,32 @@ Flshr.IndexView = Backbone.View.extend({
 
   render: function(){
     var that = this;
-    this.$el.empty();
-
-    this.decks.each(function(deck){
-      var deckname = deck.attributes.deckname;
-      var deckID = deck.attributes._id;
-      var deckLength = deck.collection.length;
+    that.$el.empty();
+    var data = this.decks.models[0].attributes;
+    var memos = data.memos;
+    var reviewCrumbs = {};
+    for (var i = 0; i < memos.length; i++){
+      var memo = memos[i]; 
+      if (!reviewCrumbs[memo._deckid]){
+        reviewCrumbs[memo._deckid] = 0;
+      }
+      var nextReviewDate = new Date(memo.nextDate).setHours(0,0,0,0);
+      var today = new Date().setHours(0,0,0,0);
+      if (nextReviewDate <= today){
+        reviewCrumbs[memo._deckid]++;
+        console.log(reviewCrumbs[memo._deckid]);
+      }
+    }
+    var decks = data.decks;
+    for (var j = 0; j < decks.length; j++){
       var uncompiledTemplate = $('#decks').html();
       var template = Handlebars.compile(uncompiledTemplate);
-      var context = {deckname: deckname, deckID: deckID};
+      var context = { deckname: decks[j].deckname,
+                      deckID: decks[j]._id,
+                      deck_length: decks[j].cards.length,
+                      cards_to_review: reviewCrumbs[decks[j]._id] };
       that.$el.append(template(context));
-    });
+    }
     return this;
   }
 

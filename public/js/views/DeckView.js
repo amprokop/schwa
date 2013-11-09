@@ -20,9 +20,9 @@ Flshr.DeckView = Backbone.View.extend({
     //on change call render
   },
 
-  // events: {
-  //   "deck_change" : "change_deck"
-  // },
+  events: {
+    "click .ratings" : "next"
+  },
 
 
   render: function(id){
@@ -40,19 +40,19 @@ Flshr.DeckView = Backbone.View.extend({
     return this;
   },
 
-  next: function(){
-    if (this.currentCard === this.deck.length - 1){
-      alert("end of deck");
-      //this.router(navigate, ResultsView)
+  next: function(e){
+    this.currentCard++;
+    if (!this.deck.at(this.currentCard)){
+      console.log('done');
+      //renderFinishedView();
       return;
     }
-    this.currentCard++;
+    console.log(e.target.className);
     this.render(this.currentCard);
   },
 
   flip: function(){
     $('#hidden').css("visibility","visible");
-
   }
 
 });

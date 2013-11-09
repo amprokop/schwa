@@ -1,6 +1,6 @@
 body {
-  font-family: 'Helvetica';
-  font-size: 20px;
+  font-family: 'Times New Roman';
+  font-size: 40px;
   font-weight: bold;
   background-color: black;
   color: white;
@@ -9,7 +9,6 @@ body {
 .card_container {
   height: 500px;
   width: 900px;
-  border: 10px solid red;
   text-align: center;
   margin-left: auto;
   margin-right: auto;
@@ -25,6 +24,25 @@ body {
   margin-left: auto;
   margin-right: auto;
 }
+
+.ratings {
+  border: 4px solid red;
+  margin-left: auto;
+  margin-right: auto;
+  text-align: center;
+}
+
+.zero {
+  font-size: 200px;
+}
+
+table, td {
+  border: 4px solid red;
+  font-size: 20px;
+  height: 100px;
+  width: 600px;
+}
+
 
 .thumbs_up {
   margin-left: 300px;

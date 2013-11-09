@@ -8,15 +8,21 @@ body {
 }
 
 .card_container {
+  border: .5px dotted gray;
   height: 500px;
   width: 900px;
-  border: 10px solid red;
   text-align: center;
+  margin-top: 40px;
   margin-left: auto;
   margin-right: auto;
 }
 
-.card_count, .current_streak, .best_streak, .sound_control {
+.deckname {
+  margin-top: 20px;
+}
+
+.card_count, .current_streak, .best_streak, .sound_control, .deck_list {
+  font-size: 15px;
   margin-left: 300px;
   padding-bottom: 50px
 }
@@ -38,7 +44,6 @@ img {
   margin-right: 200px;
   transform:scale(0.2,0.2);
 }
-
 
 .thumbs_side {
   margin-left: 300px;
@@ -65,11 +70,12 @@ img {
 }
 
 .flipper {
+  margin-top: 60px;
   width: 8em;
   height: 3em;
-  background-color: black;
-  color: red;
-  border: 6px solid red;
+  background-color: white;
+  color: black;
+  border: 6px solid white;
 }
 
 .crd {
@@ -100,3 +106,45 @@ img {
   top: 2em;
   font-size: 20px;
 }
+
+.EF {
+
+  margin-top: 80px;
+
+}
+
+table, td {
+  margin-right: auto;
+  margin-left: auto;
+  font-size: 60px;
+}
+
+td{
+  height: 100px;
+  width: 100px;
+}
+
+.zero{
+background-color: #FBD69F;
+}
+
+.one{
+background-color: #484118;
+}
+
+.two{
+background-color: #D8812C;
+}
+
+.three{
+background-color: #8BA578;
+}
+
+.four{
+background-color: #F86E34;
+}
+
+.five{
+background-color: #B21310;
+}
+

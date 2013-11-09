@@ -54,6 +54,7 @@ var Flshr = Backbone.View.extend({
     // var that = this;
     // this.$el.find('.card_container').empty();
     this.indexView = new Flshr.IndexView({el: this.$cardContainer});
+    console.log('here renderind', this.indexView);
     // this.listenTo(this.indexView, "deck_render", this.renderDeckView);
   },
 

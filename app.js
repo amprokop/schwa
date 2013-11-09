@@ -133,14 +133,18 @@ var cardSchema = mongoose.Schema({
   // first have to find the deck or make a new one, then save its id
   //THEN make the card
   //THEN return to the deck and save the card's ID.
-  //this costs us three trips to the server.. is there a way to streamline this process?
+  //...is there a way to streamline this process?
 });
 
-var superMemo = mongoose.Schema({
+var memoSchema = mongoose.Schema({
   _cardid: {type: Schema.Types.ObjectId, ref: 'Card'},
+  _deckid: {type: Schema.Types.ObjectId, ref: 'Deck'},
   _userid: {type: Schema.Types.ObjectId, ref: 'User'},
+  nextDate: Date,
+  prevDate: Date,
   interval: Number,
-  count: Number
+  repetitions: Number,
+  EF: Number
 });
 //Not used yet----- need to implement user authentication first.
 
@@ -149,7 +153,8 @@ var userSchema = mongoose.Schema({
   lastname: String,
   email: String,
   accounts: [],
-  decks: [{type: Schema.Types.ObjectId, ref: 'Deck'}]
+  decks: [{type: Schema.Types.ObjectId, ref: 'Deck'}],
+  memos: [{type: Schema.Types.ObjectId, ref: 'Memo'}]
 });
 
 var deckSchema = mongoose.Schema({
@@ -159,9 +164,11 @@ var deckSchema = mongoose.Schema({
 });
 
 
+
 var User = mongoose.model('User', userSchema);
 var Card = mongoose.model('Card', cardSchema);
 var Deck = mongoose.model('Deck', deckSchema);
+var Memo = mongoose.model('Memo', memoSchema);
 
 
 
@@ -198,10 +205,6 @@ app.get('/auth/facebook/callback',
   passport.authenticate('facebook', { successRedirect: '/index',
                                       failureRedirect: '/' }));
 
-
-
-
-
 app.get('/extension/auth/facebook', passport.authenticate('facebook'));
 
 // Facebook will redirect the user to this URL after approval.  Finish the
@@ -228,8 +231,6 @@ app.get('/extension/auth/facebook/callback',
 
 
 //APP ROUTES
-
-
 
 /*TODO: At the moment, if the user has selected a deck from the dropdown, the card will be
 placed into that deck, even if there is a value in the New Deck box. Change that.  */
@@ -267,6 +268,21 @@ app.post('/new_card/', function(req,res){
       deck.cards.push(card._id);
       deck.save();
       console.log('Card pushed to existing deck ', deck.deckname);
+      memo = new Memo({_cardid: card._id,
+                      _userid: req.user._id,
+                      _deckid: deck._id,
+                      interval: 0,
+                      repetitions: 0,
+                      EF:2.5,
+                      nextDate: new Date().setHours(0,0,0,0),
+                      prevDate: new Date().setHours(0,0,0,0)});
+      memo.save(function(err,memo){
+        console.log("New Memo created! \n", memo);
+        User.findOne({_id: req.user._id}, function(error, user){
+          user.memos.push(memo._id);
+          user.save();
+        });
+      });
     });
   } else {
     var newDeck = new Deck({deckname:deckname});
@@ -278,16 +294,25 @@ app.post('/new_card/', function(req,res){
           console.log("New deck created with name: " + deck.deckname);
           console.log("Now pushing to the current user " + req.user._id + "s decks");
           User.findOne({_id: req.user._id}, function(err,user){
-            user.decks.push(newDeck._id);
-            console.log("User found! Here are the new decks:" + user.decks);
-            user.save(function(err,deck){
+            memo = new Memo({_cardid: card._id,
+                              _userid: user._id,
+                              _deckid: deck._id,
+                              interval: 0,
+                              repetitions: 0,
+                              EF:2.5,
+                              nextDate: new Date().setHours(0,0,0,0),
+                              prevDate: new Date().setHours(0,0,0,0)});
+            memo.save(function(err,memo){
+              console.log("New Memo created! \n", memo);
             });
+            user.memos.push(memo._id);
+            user.decks.push(newDeck._id);
+            user.save();
           });
         }
       });
     }
   res.send(req.body.self);
-
 });
 
 
@@ -340,11 +365,12 @@ app.get('/chrome/new_card/*', function(req,res){
   Deck.find(function(err, decks){
     var query = url.parse(req.url).query;
     var selectedText = querystring.parse(query).text;
-    var selectedText = querystring.parse(query).url;
+    var currentUrl = querystring.parse(query).url;
     var source = {
       selectedText : selectedText,
       decks : decks,
-      url : url
+      currentUrl : currentUrl
+      //The URL isn't being stored. Start here to fix that.
     };
     var uncompiledTemplate  = fs.readFileSync(path.join(__dirname + '/chrome.html'), "utf8");
     var template = handlebars.compile(uncompiledTemplate);
@@ -387,15 +413,24 @@ app.get('/decks/*', function(req, res){
     res.redirect('/');
   }
   // res.send('searching for deck with id: ' + req.params[0])
-  var deckID = req.params[0];
-  Deck.findOne({_id: deckID})
+  var deckId = req.params[0];
+  Deck.findOne({_id: deckId})
     .populate('cards')
     .exec(function(err, deck){
       if (err) {
         console.log('there was an error', err, deck);
       } else {
-        res.send(deck.cards);
-      }
+        User.findOne({_id: req.user._id})
+          .populate({
+            path:'memos',
+            match: {_deckid: deck._id}
+          })
+          .exec(function(err, user){
+            var deckMemos = user.memos;
+            var deckCards = deck.cards;
+            res.send([deckMemos, deckCards]);
+          });
+        }
     });
 });
 
@@ -406,12 +441,10 @@ app.get('/user/decks', function(req, res){
 
     User.findOne({_id: req.user._id})
       .populate('decks')
+      .populate('memos')
       .exec(function(err, user){
-        if (err) {
-          console.log('there was an error', err, deck);
-        } else {
-          res.send(user.decks);
-        }
+          res.send(user);
+          //backbone will break here. to make it work again, send user.decks
       });
 
 //We need to retrieve pertinent information from the deck for each 

@@ -21,7 +21,10 @@
   </script>
 
   <script id="decks" type="text/x-handlebars-template">
-      <div class="dck {{deckID}}">{{deckname}}</div>
+      <div class="dck {{deckID}}">{{deckname}}<br>
+      {{deck_length}} cards. <br>
+      {{cards_to_review}} cards need review.
+      </div>
   </script>
 
   <script id="card" type="text/x-handlebars-template">
@@ -34,6 +37,18 @@
         {{back}}
       </div>
       <button class="flipper">Flip</button>
+      <div class="EF">
+        <table class="ratings">
+          <tr class="ratings">
+            <td class="zero"></td>
+            <td class="one"></td>
+            <td class="two"></td>
+            <td class="three"></td>
+            <td class="four"></td>
+            <td class="five"></td>
+          </tr>
+        </table>
+      </div>
     </div>
   </script>
 
@@ -43,11 +58,6 @@
       <span class="current_streak">Current Streak: {{current_streak}}</span>
       <span class="best_streak">Best Streak:{{best_streak}}</span>
       <div class="card_container"></div>
-      <div class="thumbs">
-        <span class="box"><img class="thumbs_down" src="/public/img/thumbs_up.png"></span>
-        <span class="box"><img class="thumbs_side" src="/public/img/thumbs_up.png"></span>
-        <span class="box"><img class="thumbs_up" src="/public/img/thumbs_up.png"></span>
-      </div>
   </div>
   </script>
 

@@ -13,13 +13,21 @@ Flshr.IndexView = Backbone.View.extend({
   },
 
   events: {
-    "click .dck" : "deck_change"
+    "click .dck" : "deck_change",
+    "click .edit" : "edit_deck"
   },
 
   deck_change: function(e){
     var deckID = e.currentTarget.className.split(' ')[1];
     console.log(deckID);
     this.trigger('deck_render', deckID);
+  },
+
+  edit_deck: function(e){
+    console.log('edit called');
+    var deckID = e.currentTarget.className.split(' ')[1];
+    console.log(deckID);
+    this.trigger('edit_deck', deckID);
   },
 
   render: function(){
@@ -37,7 +45,6 @@ Flshr.IndexView = Backbone.View.extend({
       var today = new Date().setHours(0,0,0,0);
       if (nextReviewDate <= today){
         reviewCrumbs[memo._deckid]++;
-        console.log(reviewCrumbs[memo._deckid]);
       }
     }
     var decks = data.decks;

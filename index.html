@@ -1,3 +1,4 @@
+
 <html>
 <head>
   <script src="public/bower_components/jquery/jquery.js"></script>
@@ -13,6 +14,15 @@
   <a href="/logout" class="sign_out">Sign Out</a>
 
 
+  <script id="edit" type="text/x-handlebars-template">
+    <form action="/edit/card/{{cardID}}" method="post">
+      Front:
+      <input type="text" name="front" value="{{front}}"/><br>
+      Back:
+      <input type="text" name="back" value="{{back}}"/><br>
+      <input type="submit" name="submit" value="save"/>
+    </form>
+  </script>
 
   <script id="auth" type="text/x-handlebars-template">
     <div class='top_bar'>
@@ -22,8 +32,11 @@
 
   <script id="decks" type="text/x-handlebars-template">
       <div class="dck {{deckID}}">{{deckname}}<br>
-      {{deck_length}} cards. <br>
-      {{cards_to_review}} cards need review.
+        {{deck_length}} cards. <br>
+        {{cards_to_review}} cards need review.
+      </div><br><br>
+      <div>
+        <button class="edit {{deckID}}">Edit</button>
       </div>
   </script>
 
@@ -66,6 +79,7 @@
   <script src="public/js/views/SettingsView.js"></script>
   <script src="public/js/views/IndexView.js"></script>
   <script src="public/js/views/DeckView.js"></script>
+  <script src="public/js/views/EditView.js"></script>
   <script src="public/js/router.js"></script>
   <script src="public/js/models/Deck.js"></script>
   <script src="public/js/models/Decks.js"></script>

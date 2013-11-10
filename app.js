@@ -423,6 +423,50 @@ app.get('/decks/*', function(req, res){
     });
 });
 
+app.post('/decks/*', function(req,res){
+  console.log(req.body);
+  var query = {"_id" : req.body._id};
+  var update = {interval : req.body.interval,
+                repetitions : req.body.repetitions,
+                EF : req.body.EF,
+                nextDate: req.body.nextDate,
+                prevDate: req.body.prevDate};
+  Memo.findOneAndUpdate(query, update, function(err, memo){
+    if (err){
+      console.log('error updating', err);
+    } else {
+      console.log('successsssss ', memo);
+    }
+  });
+});
+
+//
+app.get("/edit/*", function(req,res){
+  var deckid = req.params[0];
+  Deck.findOne({_id: deckid})
+    .populate('cards')
+    .exec(function(err, deck){
+    res.send(deck.cards);
+  });
+});
+
+app.post("/edit/card/*", function(req,res){
+  console.log(req.params);
+  var cardID = req.params[0];
+  var query = {"_id" : cardID};
+  var update = {front : req.body.front,
+                back : req.body.back};
+  Card.findOneAndUpdate(query, update, function(err, card){
+    if (err){
+      console.log('error updating card');
+    } else {
+      console.log('successss', card);
+    }
+  })
+
+//reset intervals, etc to zero.  
+});
+
 app.get('/user/decks', function(req, res){
     if (!req.user){
     res.redirect('/');

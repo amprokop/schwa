@@ -16,6 +16,10 @@ var passport = require('passport'),
     GoogleStrategy = require('passport-google').Strategy,
     FacebookStrategy = require('passport-facebook').Strategy;
 var keys = require('./keys.js');
+var Shred = require("shred");
+var shred = new Shred();
+
+
 
 var app = express();
 
@@ -116,7 +120,7 @@ passport.deserializeUser(function(_id, done){
 
 mongoose.connect('mongodb://localhost/flshr');
 var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection error'));
+db.on('error', console.error.bind(console, 'connection errofyftyvhgvkr'));
 db.once('open', function callback(){
   console.log('successfully connected to mongo!');
 });
@@ -246,7 +250,7 @@ app.post('/new_card/', function(req,res){
     var deckInfo = req.body.existingDeck.split("%%%");
     deckId = deckInfo[0];
     deckname = deckInfo[1];
-    console.log("\n\n\n\n\n\nID, INFO", deckId, deckname);
+    // console.log("\n\n\n\n\n\nID, INFO", deckId, deckname);
   } else {
     deckname = req.body.newDeckName;
   }
@@ -258,16 +262,61 @@ app.post('/new_card/', function(req,res){
     if (err){
       console.log(err);
     } else {
-      console.log("New card created: " + card);
+      // console.log("New card created: " + card);
     }
   });
+
+var langQuery = querystring.stringify({ q: front, key: keys.languageDetection});
+console.log(langQuery);
+var getLangUrl = 'http://ws.detectlanguage.com/0.2/detect?' + langQuery;
+
+var languageReq = shred.get({
+  url: getLangUrl,
+  headers: {
+    Accept: "application/json"
+  },
+  on: {
+    // you can use response codes as events
+    response: function(response) {
+      // We got a 40X that is not a 409, or a 50X
+      var detections = response.content.data.data.detections;
+      if (detections[0].language !== 'en'){
+        var language = detections[0].language;
+
+
+        var getTranslationUrl = 'http://api.wordreference.com/0.8/' + keys.wordReference +  '/json/'+ language + 'en/' + front;
+        console.log(getTranslationUrl);
+
+        var translationReq = shred.get({
+          url: getTranslationUrl,
+          headers: {
+            Accept: 'application/json'
+          },
+          on: {
+            response: function(response){
+              console.log("wordreferenceresponded:")
+              console.log(response.content.body.toString());
+            }
+          }
+        });
+      }   
+    }
+  }
+});
+
+
+
+
+
+
+
 //An async problem may exist here. If the Deck query starts before the Card query returns, card._id will be undefined.
   if(deckId){
     Deck.findOne({_id: deckId}, function(err,deck){
       console.log('DeckID', deckId, '\n\n\n\n\n\n\n\n\n\n\n\n\nDeck', deck);
       deck.cards.push(card._id);
       deck.save();
-      console.log('Card pushed to existing deck ', deck.deckname);
+      // console.log('Card pushed to existing deck ', deck.deckname);
       memo = new Memo({_cardid: card._id,
                       _userid: req.user._id,
                       _deckid: deck._id,
@@ -277,7 +326,7 @@ app.post('/new_card/', function(req,res){
                       nextDate: new Date().setHours(0,0,0,0),
                       prevDate: new Date().setHours(0,0,0,0)});
       memo.save(function(err,memo){
-        console.log("New Memo created! \n", memo);
+        // console.log("New Memo created! \n", memo);
         User.findOne({_id: req.user._id}, function(error, user){
           user.memos.push(memo._id);
           user.save();
@@ -290,9 +339,10 @@ app.post('/new_card/', function(req,res){
       newDeck.save(function(err,deck){
         if (err){
           console.log(err);
-        } else {
-          console.log("New deck created with name: " + deck.deckname);
-          console.log("Now pushing to the current user " + req.user._id + "s decks");
+        // } else {
+        //   console.log(req.user)
+        //   console.log("New deck created with name: " + deck.deckname);
+        //   console.log("Now pushing to the current user " + req.user._id + "s decks");
           User.findOne({_id: req.user._id}, function(err,user){
             memo = new Memo({_cardid: card._id,
                               _userid: user._id,
@@ -303,7 +353,7 @@ app.post('/new_card/', function(req,res){
                               nextDate: new Date().setHours(0,0,0,0),
                               prevDate: new Date().setHours(0,0,0,0)});
             memo.save(function(err,memo){
-              console.log("New Memo created! \n", memo);
+              // console.log("New Memo created! \n", memo);
             });
             user.memos.push(memo._id);
             user.decks.push(newDeck._id);

@@ -1,3 +1,33 @@
+/*Hi code reviewer (Shawn?), here are a few questions/concerns I have.
+
+app.js
+--I'm storing the Mongoose models as global variables. Is this a very bad idea? How should I better organize it?
+--I'm aware that the names of things need to be changed.
+
+index.html
+--is it better to strip out the templates and include them in seperate files?
+
+Backbone generally
+--Because I have to populate subfields to retrieve all the data I need, 
+the result of my MongoDB query is a little messy.
+Due to this, I can't use the built-in Backbone methods and it looks really bad. 
+I can think of two ways to resolve this problem.
+The first: Use Backbone.parse to chisel my data into the shape that I want it after I retrieve it from the server
+The second: Manipulate it on the server and send it back better formatted.
+Would you suggest either way? Or something else?
+
+
+--I'm doing some data manipulation in the Views--that's where my spaced repitition algorithm currently lives.
+Should it be moved to the model? Or on the backend? I'm not really sure what the main considerations in favor of
+either would be.
+
+Thanks for taking the time to look at this!
+-Alex
+*/
+
+
+
+
 //TODO: add--deleting cards
 //on get for new card, lookup the selected text
 //TODO: There is a high confidence that your text is in spanish. Try to translate?

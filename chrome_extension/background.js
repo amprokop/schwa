@@ -12,7 +12,6 @@ for (var i = 0; i < contexts.length; i++) {
   var id = chrome.contextMenus.create({"title": title, "contexts":[context], "id": context});
 }
 
-
 chrome.browserAction.onClicked.addListener(function(tab) {
   var postUrl = "http://localhost:8080/chrome/";
   chrome.windows.create({"url":postUrl, "type":"popup", "height":300,"width":600, "top": 100, "left":100});

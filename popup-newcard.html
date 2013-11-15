@@ -1,9 +1,10 @@
 <html>
 <head>
-</form>
+<!-- script src="http://code.jquery.com/jquery-1.9.1.js"></script !-->
 </head>
   <body>
   <a href="/chrome/logout" class="sign_out">Sign Out</a>
+  <a href="/newdeck" class="newDeckButton">New Deck</a>
   <!-- input type="button" id="newDeckButton" value="New Deck"><br -->
   <form id="myForm" method="post">
     Inspect ya deck:
@@ -13,30 +14,26 @@
       <option value="{{this._id}}%%%{{this.deckname}}"> {{this.deckname}}</option>
       {{/each}}
     </select><br>
-
-
-
-
       Front: 
       <input type="text" name="front" value="{{selectedText}}" required><br>
       Back: 
-      <table class="definitionsTable">
-        <tr>
-          <td></td> 
-          <td>Translation</td> 
-          <td>Sense</td>
-        </tr> 
-        {{each translations}}
-          <tr>
-            <td><input type</td>
-            <td></td>
-            <td></td>
-          </tr>
-
-      </table>
-      <input type="submit" name="submit" method="post" value="Add"><br><br>
+      <input type="text" name="back"/><br>
+      <input type="submit" name="translate" onclick="onsumbmitform()" value="translateCard"><br><br>
+      <input type="submit" name="submit" onclick="document.pressed = this.value" value="addCard"><br><br>
   </form>
 </body>
+<script type='text/javascript'>
+  var onsubmitform = function() {
+    console.log('called');
+    if (document.pressed === 'translateCard'){
+      document.getElementById('#myform').action = '/chrome/translate/';
+    }
+    if (document.pressed === 'addCard'){
+      document.getElementById('#myform').action = '/new_card/';
+    }
+    return true;
+  }
+</script> 
 </html>
 
 

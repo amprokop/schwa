@@ -30,15 +30,31 @@
     </div>
   </script>
 
-  <script id="decks" type="text/x-handlebars-template">
-      <div class="dck {{deckID}}">{{deckname}}<br>
-        {{deck_length}} cards. <br>
-        {{cards_to_review}} cards need review.
-      </div><br><br>
-      <div>
-        <button class="edit {{deckID}}">Edit</button>
-      </div>
-  </script>
+<script id="decks-template" type="text/x-handlebars-template">
+  <table class="decksTable">
+    {{#each decks}}
+      {{#if_even @index}}
+        <tr class="decksRow">
+      {{/if_even}}
+        <td class="decksCell">
+          <span class="dck {{this._id}}"> 
+            {{this.deckname}}<br>
+            <span class="deckStats">
+            {{this.cards.length}} cards. <br>
+            {{this.cardstoReview}} cards need review.
+            </span>
+          </span>
+          <div><button class="edit {{this._id}}">Edit</button></div>
+          <div><button class="delete {{this._id}}">Delete</button></div>
+        </td>
+      {{#if_even @index}}
+      {{else}}
+        </tr>
+      {{/if_even}}
+    {{/each}}
+  </table>
+</script>
+
 
   <script id="card" type="text/x-handlebars-template">
   <div class='deckname'>{{deckname}}</div>

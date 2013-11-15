@@ -3,23 +3,9 @@
 Flshr.DeckView = Backbone.View.extend({
   model: Flshr.Deck,
 
-
-  initialize: function(url){
+  initialize: function(){
     this.currentCard = 0;
     this.deck = new Flshr.Deck();
-    if (this.id){
-      this.deck.url = "/decks/" + this.id;
-    }
-    // this.on('deck_change', function(e){
-    //   this.change_deck(e);
-    // });
-    var that = this;
-    this.deck.fetch({
-      success: function(){
-        that.nextCard(this.currentCard);
-      }
-    });
-    //on change call render
   },
 
   events: {
@@ -28,11 +14,48 @@ Flshr.DeckView = Backbone.View.extend({
   },
 
 
+//separate cards into two groups: needingReview and not 
+  startReview: function(){
+    console.log('review started')
+    var decks = this.deck.models;
+    this.currentCard = 0;
+    this.endOfReviewReached = false;
+    this.sortByReviewDate(decks);
+  },
+
+  sortByReviewDate: function(decks){
+    var compare = function(a,b){
+      if (a.attributes.nextDate > b.attributes.nextDate){return 1};
+      if (a.attributes.nextDate < b.attributes.nextDate){return -1};
+      return 0;
+    }
+    decks.sort(compare);
+    this.nextCard();
+  },   
+
+  nextCard: function(){
+    if (this.currentCard === this.deck.models.length){
+      this.$el.prepend('<span> End of deck. </span>');
+      return;
+    }
+    var card = this.deck.models[this.currentCard].attributes;
+    if(this.endReached){
+      this.$el.find('.endMessage').remove();
+    }
+    if (!this.needsReview(card) && !this.endReached){
+      this.$el.prepend('<span class="endMessage"> End of review. Continue or check out your progress!</span>');
+      this.endOfReviewReached = true;
+    }
+    console.log(this.currentCard)
+    this.render(this.currentCard);
+    this.currentCard++;
+  },
+
   render: function(id){
+    console.log('render called');
     var front = this.deck.models[id].attributes._cardid.front;
     var back = this.deck.models[id].attributes._cardid.back;
     var deckname = this.deck.models[id].attributes._cardid.deckname;
-
     var context = {front: front, back: back, deckname:deckname};
     var uncompiledTemplate = $('#card').html();
     var template = Handlebars.compile(uncompiledTemplate);
@@ -40,38 +63,24 @@ Flshr.DeckView = Backbone.View.extend({
     return this;
   },
 
-  nextCard: function(){
-    console.log("nextcalled");
-    if (!this.deck.models[this.currentCard]){
-      this.$el.append('<div>End of review. Continue or review your progress.</div>');
-      return;
-    }
-    var card = this.deck.models[0].attributes;
-    if (this.needsReview(card)){
-      this.render(this.currentCard);
-      return;
-    } else {
-    this.currentCard++;
-    // this.nextCard();
-    }
-  },
-
-
   needsReview: function(card){
-    var nextReviewDate = new Date(card.nextDate).setHours(0,0,0,0);
+    var nextReviewDate = card.nextDate;
     var today = new Date().setHours(0,0,0,0);
     if (nextReviewDate <= today){
-      return  true;
+      return true;
     }
     return false;
   },
 
   gradeCard: function(e){
-    console.log("grade called");
+    if (!this.needsReview(card)){
+      console.log('card not graded--it doesn\'t need review')
+      this.nextCard();
+      return;
+    }
     var grade = e.target.className;
-    this.currentCard++;
-    console.log(grade);
-    this.calcIntervalEF(this.currentCard, grade);
+    this.calculateEF(this.currentCard, grade);
+    console.log('card graded');
     this.nextCard();
   },
 
@@ -79,19 +88,14 @@ Flshr.DeckView = Backbone.View.extend({
     $('#hidden').css("visibility","visible");
   },
 
-  onClose: function () {
-    this.model.unbind();
-    this.collection.unbind();
-  },
-
-
-  calcIntervalEF: function (cardID, gradeString) {
-    var today = new Date();
-    today.setHours(0,0,0,0);
+  calculateEF: function (cardID, gradeString) {
+    if (!this.deck.models[cardID]){
+      return;
+    }
+    var today = new Date().setHours(0,0,0,0);
     var card = this.deck.models[cardID].attributes;
     var oldEF = card.EF,
-        newEF = 0,
-        nextDate = new Date(today);
+        newEF = 0,d
     var gradeNums = {
       zero : 0,
       one : 1,
@@ -140,16 +144,16 @@ Flshr.DeckView = Backbone.View.extend({
       //if you had great difficulty remembering it, then review it today.
     }
 
-    nextDate.setDate(today.getDate() + card.interval);
-    card.nextDate = nextDate;
+    card.nextDate = today + (card.interval * 24 * 60 * 60 * 1000);
+    //
     //calculate when you should review things.
     this.deck.models[cardID].attributes = card;
     this.deck.models[cardID].save(null, {
       success: function (model, response){
-        console.log('saved');
+        console.log('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  card saved\n', model );
       },
       error: function (model, response){
-        console.log('error');
+        console.log('\n\n\n\n\n\n\n\n\n\n\n\n\n\nerror', model );
       }
     });
   }

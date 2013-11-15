@@ -1,35 +1,27 @@
 // var Flshr = {};
 // _.extend(Flshr, Backbone.Events);
-
-// Flshr.AppView = Backbone.View.extend({
-// Backbone.View.prototype.close = function () {
-//     console.log('Unbinding events for ' + this.cid);
-//     this.remove();
-//     this.unbind();
-//     if (this.onClose) {
-//         this.onClose();
-//     }
-// };
-
+// vent = _.extend({}, Backbone.Events);
+// vent.on("some:event", function(){
+//   console.log("some event was fired");
+// });
 
 var Flshr = Backbone.View.extend({
 
   events: {
-    "click .deck_list" : "renderIndexView"
+    "click .deck_list" : "renderIndexView",
+    "edit_deck" : "renderEditView",
+    "delete_deck" : "deleteDeck"
   },
 
   initialize: function(){
     var uncompiledTemplate = $('#app').html();
     this.template = Handlebars.compile(uncompiledTemplate);
     $(document.body).append(this.render().el);
+    this.router = new Flshr.Router({el: this.$el.find('.card_container')});
+    Backbone.history.start({pushState: true});
     this.renderIndexView();
-    this.listenTo(this.indexView, "deck_render", this.renderDeckView);
-    this.listenTo(this.indexView, "edit_deck", this.renderEditView);
-
-    // $('.card_container').html(this.renderDeckView().$el.html());
-    // this.router = new Flshr.Router({el: this.$el.find('#cards_container')});
-    // Not using a router at the moment. Would a router be helpful here?
-    // Backbone.history.start({pushState: true});
+    // this.listenTo(this.indexView, "deck_render", this.deck);
+    // this.listenTo(this.indexView, "edit_deck", this.edit);
   },
 
   render: function(){
@@ -38,43 +30,29 @@ var Flshr = Backbone.View.extend({
     return this;
   },
 
-  //useless function:
-  // switch_deck: function(e){
-  //   var getURL = e;
-  //   console.log(getURL);
-  //   this.renderDeckView(e);
-  //   this.deckView.trigger('deck_change', getURL);
-  // },
+  // renderDeckView: function(e){
+  //   // this.$cardContainer.empty();
+  //   // this.deckView = new Flshr.DeckView({el: this.$cardContainer, id: e});
+  //   // return this.deckView;
+  //   // e && e.preventDefault();,,kl,uhy
+  //   // this.router.navigate("/deck", {trigger: true});
 
-  renderDeckView: function(e){
-    this.$cardContainer.empty();
-    this.deckView = new Flshr.DeckView({el: this.$cardContainer, id: e});
-    return this.deckView;
-  },
+  // },
 
   renderIndexView: function(){
-    // var that = this;
-    // this.$el.find('.card_container').empty();
-    // if (!this.indexView){
-    //   this.indexView = new Flshr.IndexView({el: this.$cardContainer});
-    // // } else {
-    //   this.indexView.close();
-      this.indexView = new Flshr.IndexView({el: this.$cardContainer});      
-    // }
-    // this.listenTo(this.indexView, "deck_render", this.renderDeckView);
-  },
-
-  renderEditView: function(e){
-    this.editView = new Flshr.EditView({el: this.$cardContainer, id: e});
+    this.router.index();
+      // this.indexView = new Flshr.IndexView({el: this.$cardContainer});
+      // e && e.preventDefault();
+      // console.log('renderIndexView called in appView');
+      // this.listenTo(this.indexView, "edit_deck", this.renderDeckView);
+      
   }
 
-  // renderNextCard: function(e){
-  //   this.deckView.next();
-  // },
-
-  // cardFlip: function(){
-  //   this.deckView.flip();
-  // }
+  // renderEditView: function(e){
+  //   // this.editView = new Flshr.EditView({el: this.$cardContainer, id: e});
+  //   // e && e.preventDefault(); 
+  //   // this.router.navigate("/edi", {trigger: true});
+// }
 
 
 });

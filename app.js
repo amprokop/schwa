@@ -1,3 +1,8 @@
+//TODO: add--deleting cards
+//on get for new card, lookup the selected text
+
+//there is a high confidence that your text is in spanish. Try to translate?
+
 //Presently, your Chrome extension links to localhost:8080 for its popup. Must change in the build! Don't spend hours figuring this out.
 //The extension's logout button is broken. When logging out and signing back in through the extension, you're redirected to the index page
 
@@ -109,21 +114,14 @@ passport.deserializeUser(function(_id, done){
 
 
 
-
-
-
-
-
-
-
 //DATABASE SETUP
 
 mongoose.connect('mongodb://localhost/flshr');
 var db = mongoose.connection;
-db.on('error', console.error.bind(console, 'connection errofyftyvhgvkr'));
-db.once('open', function callback(){
-  console.log('successfully connected to mongo!');
-});
+db.on('error', console.error.bind(console, 'there was an error when connecting to mongodb'));
+// db.once('open', function callback(){
+//   console.log('successfully connected to mongo!');
+// });
 
 var cardSchema = mongoose.Schema({
   front: String,
@@ -144,8 +142,8 @@ var memoSchema = mongoose.Schema({
   _cardid: {type: Schema.Types.ObjectId, ref: 'Card'},
   _deckid: {type: Schema.Types.ObjectId, ref: 'Deck'},
   _userid: {type: Schema.Types.ObjectId, ref: 'User'},
-  nextDate: Date,
-  prevDate: Date,
+  nextDate: Number, 
+  prevDate: Number,
   interval: Number,
   repetitions: Number,
   EF: Number
@@ -162,9 +160,12 @@ var userSchema = mongoose.Schema({
 });
 
 var deckSchema = mongoose.Schema({
+  _creator: [{type: Schema.Types.ObjectId, ref: 'User'}],
   deckname: String,
   cards: [{type: Schema.Types.ObjectId, ref: 'Card' }],
-  _creator: [{type: Schema.Types.ObjectId, ref: 'User'}]
+  defaultLang: String,
+  autoTranslate: Boolean,
+  saveURL: Boolean,
 });
 
 
@@ -177,15 +178,7 @@ var Memo = mongoose.model('Memo', memoSchema);
 
 
 
-
-
-
-
-
-
-
-
-
+//if the user has a default language in one of his or her decks, and it matches up with the language detected, then add
 
 
 
@@ -239,12 +232,174 @@ app.get('/extension/auth/facebook/callback',
 /*TODO: At the moment, if the user has selected a deck from the dropdown, the card will be
 placed into that deck, even if there is a value in the New Deck box. Change that.  */
 
-app.post('/new_card/', function(req,res){
-  if (!req.user){
-    res.redirect('/extension-login');
+
+
+
+
+
+app.delete('/delete/deck', function(req, res){
+  console.log('the deck in question:', req.body.deckId);
+  var deckId = req.body.deckId;
+
+  console.log(typeof deckId);
+
+  Deck.findOne({_id : deckId}).remove(function(err, deck){
+    if (err){ console.log('deck remove error   ', err) };
+  });
+  User.findOne({_id : req.user._id}, function(err, user){
+    if (err){console.log(err)}; 
+    for (var i = 0; i < user.decks.length; i++){
+      console.log('searching for deck: ', deckId, 'current deck: ', user.decks[i]);
+      if (user.decks[i] === deckId){
+        user.decks.splice(user.decks[i], 1);
+        break;
+      }
+    }
+    user.save(function(err, user){
+      if (err){ console.log('user deck delete error    ', err)}
+    });
+  });
+  //This doesn't delete all the cards or the memos. Ghost records will exist.
+});
+
+
+
+
+app.post('/new_card/translated', function(req,res){
+  if (!req.user){ res.redirect('/extension-login') };
+  
+  var front = req.body.front, back = definitionObjectParser(req.body).join(',\n'), deckId = req.body.deckId, deckname = req.body.deckname;
+  console.log(back);
+  if (!front){ res.write("Hey! You tried to submit an empty card!"); }
+
+  var card = new Card({front: front, back: back, deckname: deckname});
+  card.save(function(err, card){
+    if (err){ console.log(err);} 
+    console.log('card back', card.back)
+  });
+//An async problem may exist here. If the Deck query starts before the Card query returns, card._id will be undefined.
+  Deck.findOne({_id: deckId}, function(err,deck){
+    deck.cards.push(card._id);
+    deck.save();
+    memo = new Memo({_cardid: card._id,
+                    _userid: req.user._id,
+                    _deckid: deck._id,
+                    interval: 0,
+                    repetitions: 0,
+                    EF:2.5,
+                    nextDate: new Date().setHours(0,0,0,0),
+                    prevDate: new Date().setHours(0,0,0,0)
+                  });
+    memo.save(function(err,memo){
+      User.findOne({_id: req.user._id}, function(error, user){
+        user.memos.push(memo._id);
+        user.save();
+      });
+    });
+  });
+  res.send(req.body.self);
+  console.log(req.body);
+});
+
+
+
+app.get('/newdeck', function(req,res){
+  //add SelectedText in there using querystring
+  //or keep it somewhere?????
+  fs.createReadStream(path.join(__dirname + '/newdeck.html')).pipe(res);
+});
+
+
+app.post('/new_deck', function(req,res){
+  console.log("NEW DECK CALLED");
+  if (!req.user){ res.redirect('/extension-login') };
+  var deckname = req.body.deckName;
+  var defaultLang = req.body.defaultLanguage;
+  var saveUrl;
+  var autoTranslate;
+  req.body.urlPref ? saveUrl = true : saveUrl = false;
+  req.body.translationPref ? autoTranslate = true : autoTranslate = false;
+  Deck.findOne({deckname: deckname, _creator: req.user._id}, function(err,deck){
+    if (deck){
+      res.write('Deck already exists. Don\'t do this to me! Log in to the website to delete.')
+    } else {
+      var newDeck = new Deck({deckname:deckname, defaultLang: defaultLang, autoTranslate: autoTranslate, saveUrl: saveUrl, _creator: req.user._id });
+      newDeck.save(function(err,deck){
+        if (err){
+          console.log(err);
+        } else {
+          console.log(req.user)
+          console.log("New deck created with name: " + deck.deckname);
+          User.findOne({_id: req.user._id}, function(err, user){
+            if (err){
+              console.log(err);
+            } else {
+              console.log("Now pushing to the current user " + req.user._id + "s decks");
+              user.decks.push(newDeck._id);
+              console.log(user.decks);
+              user.save(function(err,user){
+                if (err){
+                  console.log(err);
+                }              
+              });
+            }
+          });
+        }
+      });
+    }
+  });
+  res.redirect('/chrome');
+});
+
+
+app.post('/chrome/translate', function(req,res){
+  var deckname = req.body.existingDeck.split("%%%")[1];
+  var deckId = req.body.existingDeck.split("%%%")[0];
+  var text = req.body.front;
+  console.log("REEEEEQQQreq", req.body);
+
+  Deck.findOne({_id: deckId}, function(err, deck){
+    if (err){console.log(err)};
+    console.log('\n\n\n\n\n\n\n\n\n\nn\n\n\n\n\n\nnn\n\n\n\n\n\n\n\n\'',deck)
+    var lang = deck.defaultLang;
+    if (lang === "en"){
+      window.alert('The language for this deck is English. Translation is only available from other languages to English. Sorry!')
+      return;
+    };
+    var getTranslationUrl = 'http://api.wordreference.com/0.8/' + keys.wordReference +  '/json/'+ lang + 'en/' + text.split(" ").join("+");
+    console.log(getTranslationUrl);
+    var translationReq = shred.get({
+      url: getTranslationUrl,
+      headers: {
+        Accept: 'application/json'
+      },
+      on: {
+        response: function(response){
+          console.log("wordreferenceresponded:")
+          console.log(response.content.body.toString());
+          var translations = wordAPIOutputParser(JSON.parse(response.content.body.toString()));
+          console.log('translations\n', translations)
+          var source = { translations : translations, front : text, deckname: deckname, deckId: deckId };
+          console.log('source\n', source);
+          var uncompiledTemplate  = fs.readFileSync(path.join(__dirname + '/chrome-translate.html'), "utf8");
+          var template = handlebars.compile(uncompiledTemplate);
+          var populatedTemplate = template(source);
+          console.log(populatedTemplate);
+          res.write(populatedTemplate);
+        }
+      }
+    });
+  });
+});
+
+
+app.post('/new_card', function(req,res){
+  if (!req.user){ res.redirect('/extension-login') };
+  var front = req.body.front, back = req.body.back, deckId;
+  if (!front){
+    res.write("Hey! You tried to submit an empty card!");
   }
 
-  var front = req.body.front, back = req.body.back, deckname, deckId;
   if (req.body.existingDeck !== ""){
     //Can we just use falsey values?
     var deckInfo = req.body.existingDeck.split("%%%");
@@ -254,9 +409,7 @@ app.post('/new_card/', function(req,res){
   } else {
     deckname = req.body.newDeckName;
   }
-
 //TODO: add _creator to card?
-
   var card = new Card({front: front, back: back, deckname: deckname});
   card.save(function(err, card){
     if (err){
@@ -265,58 +418,11 @@ app.post('/new_card/', function(req,res){
       // console.log("New card created: " + card);
     }
   });
-
-var langQuery = querystring.stringify({ q: front, key: keys.languageDetection});
-console.log(langQuery);
-var getLangUrl = 'http://ws.detectlanguage.com/0.2/detect?' + langQuery;
-
-var languageReq = shred.get({
-  url: getLangUrl,
-  headers: {
-    Accept: "application/json"
-  },
-  on: {
-    // you can use response codes as events
-    response: function(response) {
-      // We got a 40X that is not a 409, or a 50X
-      var detections = response.content.data.data.detections;
-      if (detections[0].language !== 'en'){
-        var language = detections[0].language;
-
-
-        var getTranslationUrl = 'http://api.wordreference.com/0.8/' + keys.wordReference +  '/json/'+ language + 'en/' + front;
-        console.log(getTranslationUrl);
-
-        var translationReq = shred.get({
-          url: getTranslationUrl,
-          headers: {
-            Accept: 'application/json'
-          },
-          on: {
-            response: function(response){
-              console.log("wordreferenceresponded:")
-              console.log(response.content.body.toString());
-            }
-          }
-        });
-      }   
-    }
-  }
-});
-
-
-
-
-
-
-
 //An async problem may exist here. If the Deck query starts before the Card query returns, card._id will be undefined.
   if(deckId){
     Deck.findOne({_id: deckId}, function(err,deck){
-      console.log('DeckID', deckId, '\n\n\n\n\n\n\n\n\n\n\n\n\nDeck', deck);
       deck.cards.push(card._id);
       deck.save();
-      // console.log('Card pushed to existing deck ', deck.deckname);
       memo = new Memo({_cardid: card._id,
                       _userid: req.user._id,
                       _deckid: deck._id,
@@ -324,9 +430,9 @@ var languageReq = shred.get({
                       repetitions: 0,
                       EF:2.5,
                       nextDate: new Date().setHours(0,0,0,0),
-                      prevDate: new Date().setHours(0,0,0,0)});
+                      prevDate: new Date().setHours(0,0,0,0)
+                    });
       memo.save(function(err,memo){
-        // console.log("New Memo created! \n", memo);
         User.findOne({_id: req.user._id}, function(error, user){
           user.memos.push(memo._id);
           user.save();
@@ -339,7 +445,7 @@ var languageReq = shred.get({
       newDeck.save(function(err,deck){
         if (err){
           console.log(err);
-        // } else {
+        } else {
         //   console.log(req.user)
         //   console.log("New deck created with name: " + deck.deckname);
         //   console.log("Now pushing to the current user " + req.user._id + "s decks");
@@ -357,6 +463,7 @@ var languageReq = shred.get({
             });
             user.memos.push(memo._id);
             user.decks.push(newDeck._id);
+            console.log(user.decks);
             user.save();
           });
         }
@@ -366,6 +473,39 @@ var languageReq = shred.get({
 });
 
 
+app.post('/decks/*', function(req,res){
+  console.log(req.body);
+  var query = {"_id" : req.body._id};
+  var update = {interval : req.body.interval,
+                repetitions : req.body.repetitions,
+                EF : req.body.EF,
+                nextDate: req.body.nextDate,
+                prevDate: req.body.prevDate};
+  Memo.findOneAndUpdate(query, update, function(err, memo){
+    if (err){
+      console.log('error updating', err);
+    } else {
+      console.log('successsssss ', memo);
+    }
+  });
+});
+
+app.post("/edit/card/*", function(req,res){
+  console.log(req.params);
+  var cardID = req.params[0];
+  var query = {"_id" : cardID};
+  var update = {front : req.body.front,
+                back : req.body.back};
+  Card.findOneAndUpdate(query, update, function(err, card){
+    if (err){
+      console.log('error updating card');
+    } else {
+      console.log('successss', card);
+    }
+  })
+
+//reset intervals, etc to zero.  
+});
 
 
 app.get('/', function(req,res){
@@ -382,9 +522,9 @@ app.get('/chrome/logout', function(req, res){
   res.redirect('/extension-login');
 });
 
-app.get('/chrome/new_card/', function(req,res){
-  fs.createReadStream(path.join(__dirname + '/chrome.html')).pipe(res);
-});
+// app.get('/chrome/new_card/', function(req,res){
+//   fs.createReadStream(path.join(__dirname + '/chrome.html')).pipe(res);
+// });
 
 
 app.get('/extension-login', function(req,res){
@@ -392,37 +532,56 @@ app.get('/extension-login', function(req,res){
 });
 
 app.get('/chrome', function(req,res){
-  if (!req.user){
-    res.redirect('/extension-login');
-  }
-  Deck.find(function(err, decks){
-    var source = {
-      decks : decks
-    };
-    var uncompiledTemplate  = fs.readFileSync(path.join(__dirname + '/chrome.html'), "utf8");
+  if (!req.user){ res.redirect('/extension-login') };
+  User.findOne({_id: req.user._id})
+  .populate('decks')
+  .exec(function(err, user){
+    var source = { decks : user.decks };
+    var uncompiledTemplate  = fs.readFileSync(path.join(__dirname + '/chrome-newcard.html'), "utf8");
     var template = handlebars.compile(uncompiledTemplate);
     var populatedTemplate = template(source);
     res.write(populatedTemplate);
   });
 });
 
+  // if (!req.user){ res.redirect('/extension-login') };
+  // User.findOne({_id: req.user._id})
+  // .populate('decks')
+  // .exec(function(err, user){
+  //   var query = url.parse(req.url).query;
+  //   var selectedText = querystring.parse(query).text;
+  //   var currentUrl = querystring.parse(query).url;
+  //   var source = {
+  //     selectedText : selectedText,
+  //     decks : decks,
+  //     currentUrl : currentUrl
+  //     //The URL isn't being stored. Start here to fix that.
+  //   };
+  //   //lookup
+  //   var uncompiledTemplate  = fs.readFileSync(path.join(__dirname + '/chrome.html'), "utf8");
+  //   var template = handlebars.compile(uncompiledTemplate);
+  //   var populatedTemplate = template(source);
+  //   console.log(populatedTemplate);
+  //   res.write(populatedTemplate);
+  // });
 
 
 app.get('/chrome/new_card/*', function(req,res){
-  if (!req.user){
-    res.redirect('/extension-login');
-  }
-  Deck.find(function(err, decks){
+  if (!req.user){ res.redirect('/extension-login') };
+  User.findOne({_id: req.user._id})
+  .populate('decks')
+  .exec(function(err, user){
     var query = url.parse(req.url).query;
     var selectedText = querystring.parse(query).text;
     var currentUrl = querystring.parse(query).url;
     var source = {
-      selectedText : selectedText,
-      decks : decks,
+      selectedText : selectedText.substring(1,selectedText.length),  
+      decks : user.decks,
       currentUrl : currentUrl
       //The URL isn't being stored. Start here to fix that.
     };
-    var uncompiledTemplate  = fs.readFileSync(path.join(__dirname + '/chrome.html'), "utf8");
+    //lookup
+    var uncompiledTemplate  = fs.readFileSync(path.join(__dirname + '/chrome-newcard.html'), "utf8");
     var template = handlebars.compile(uncompiledTemplate);
     var populatedTemplate = template(source);
     console.log(populatedTemplate);
@@ -458,6 +617,7 @@ app.get('/decks', function(req, res){
   });
 });
 
+
 app.get('/decks/*', function(req, res){
   if (!req.user){
     res.redirect('/');
@@ -473,23 +633,6 @@ app.get('/decks/*', function(req, res){
     });
 });
 
-app.post('/decks/*', function(req,res){
-  console.log(req.body);
-  var query = {"_id" : req.body._id};
-  var update = {interval : req.body.interval,
-                repetitions : req.body.repetitions,
-                EF : req.body.EF,
-                nextDate: req.body.nextDate,
-                prevDate: req.body.prevDate};
-  Memo.findOneAndUpdate(query, update, function(err, memo){
-    if (err){
-      console.log('error updating', err);
-    } else {
-      console.log('successsssss ', memo);
-    }
-  });
-});
-
 //
 app.get("/edit/*", function(req,res){
   var deckid = req.params[0];
@@ -500,22 +643,7 @@ app.get("/edit/*", function(req,res){
   });
 });
 
-app.post("/edit/card/*", function(req,res){
-  console.log(req.params);
-  var cardID = req.params[0];
-  var query = {"_id" : cardID};
-  var update = {front : req.body.front,
-                back : req.body.back};
-  Card.findOneAndUpdate(query, update, function(err, card){
-    if (err){
-      console.log('error updating card');
-    } else {
-      console.log('successss', card);
-    }
-  })
 
-//reset intervals, etc to zero.  
-});
 
 app.get('/user/decks', function(req, res){
     if (!req.user){
@@ -527,47 +655,45 @@ app.get('/user/decks', function(req, res){
       .populate('memos')
       .exec(function(err, user){
           res.send(user);
-          //backbone will break here. to make it work again, send user.decks
+          //backbone's built in features break here. to make it work again, send user.decks
       });
-
-//We need to retrieve pertinent information from the deck for each 
-    // User.findOne({_id: userID})
-    //   .populate('decks')
-    //   .exec(function(err, user){
-    //     if (err) {
-    //       console.log('there was an error', err, deck);
-    //     } else {
-    //       user.decks.each
-    //       .populate('cards')
-    //       .exec(function(err,deck){}
-    //     }
-    //   })
 });
 
 
+var wordAPIOutputParser = function(dictObj){
+    var output = [];
+    var traverse = function(input){
+        if (typeof input !== 'object'){
+                return;
+        }      
+        for (key in input){
+            if (key === "FirstTranslation" || key === "SecondTranslation" || key === "ThirdTranslation" || key === "FourthTranslation"){
+                output.push({'term' : input[key]['term'], 'sense' : input[key]['sense']});
+                console.log('pushing');
+            } else {
+                traverse(input[key]);
+            }
+        }
+    };   
+  traverse(dictObj);
+  return output;
+};
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+var definitionObjectParser = function(obj){
+    var i = 0;
+    var parsed = []
+    while (obj[i.toString()] ) {
+        if(obj['sense ' + i]){
+            parsed.push( obj['term ' + i]    + ' (' + obj['sense ' + i] + ')'  );
+        } else {
+            parsed.push( obj['term ' + i] );   
+        }
+      i++;
+    }
+    return parsed;
+};
 
 
 
@@ -577,7 +703,5 @@ app.get('/user/decks', function(req, res){
 
 app.listen(8080);
 console.log('express app listening on 8080.....');
-
-
 
 

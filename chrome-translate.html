@@ -5,36 +5,29 @@
   <body>
   <a href="/chrome/logout" class="sign_out">Sign Out</a>
   <!-- input type="button" id="newDeckButton" value="New Deck"><br -->
-  <form id="myForm" method="post">
-    Inspect ya deck:
-    <select name="existingDeck" id="deckChooser">
-      <option value="">Inspect ya deck</option>
-      {{#each decks}}
-      <option value="{{this._id}}%%%{{this.deckname}}"> {{this.deckname}}</option>
-      {{/each}}
+  <form id="myForm" method="post" action="/new_card/translated">
+    Deckname: <input type="hidden" name="deckId" value="{{deckId}}">
+    <input type="hidden" name="deckname" value="{{deckname}}">
+    {{deckname}}</span>
     </select><br>
-
-
-
-
       Front: 
-      <input type="text" name="front" value="{{selectedText}}" required><br>
+      <input type="text" name="front" value="{{front}}" required><br>
       Back: 
       <table class="definitionsTable">
         <tr>
-          <td></td> 
+          <td name="deckname" value="{{deckname}}" ></td> 
           <td>Translation</td> 
           <td>Sense</td>
         </tr> 
-        {{each translations}}
+        {{#each translations}}
           <tr>
-            <td><input type</td>
-            <td></td>
-            <td></td>
+            <td><input type="checkbox" name="{{@index}}">
+            <td><input type="text" name="term {{@index}}" value="{{this.term}}"></td>
+            <td><input type="text" name="sense {{@index}}" value="{{this.sense}}"></td>
           </tr>
-
+        {{/each}}
       </table>
-      <input type="submit" name="submit" method="post" value="Add"><br><br>
+      <input type="submit" name="submit" method="post" value="Add Card"><br><br>
   </form>
 </body>
 </html>

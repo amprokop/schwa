@@ -148,3 +148,16 @@ background-color: #F86E34;
 background-color: #B21310;
 }
 
+.decksRow, .decksCell {
+  border: 2px solid white;
+  font-size: 30px
+}
+
+.decksCell {
+  height: 10px;
+  width: 100px;
+}
+
+.deckStats {
+  font-size: 15px;
+}

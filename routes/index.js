@@ -1,0 +1,12 @@
+var fs = require('fs');
+var path = require('path');
+var handlebars = require('handlebars');
+
+exports.logIn = function(req,res){
+  fs.createReadStream(path.join('./views/signin.html')).pipe(res);
+};
+
+exports.logOut = function(req, res){
+  req.logout();
+  res.redirect('/');
+};

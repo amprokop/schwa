@@ -7,7 +7,6 @@
   <script src="public/bower_components/handlebars/handlebars.js"></script>
   <script src="public/bower_components/passport/passport.js"></script>
   <link rel="stylesheet" type="text/css" href="/public/css/cards.css">
-
 </head>
 
 
@@ -29,36 +28,38 @@
     </div>
   </script>
 
-<script id="decks-template" type="text/x-handlebars-template">
-  <table class="decksTable">
-    {{#each decks}}
-      {{#if_even @index}}
-        <tr class="decksRow">
-      {{/if_even}}
-        <td class="decksCell">
-          <span class="cellInterior">
-            <div class="dck {{this._id}}"> 
-              {{this.deckname}}<br>
-              <span class="deckStats">
-              {{this.cards.length}} cards. <br>
-              {{this.cardstoReview}} cards need review.
-              </span>
-            </div>
-            <div><button class="edit {{this._id}}">Edit</button></div>
-            <div><button class="delete {{this._id}}">Delete</button></div>
-          </span>
-        </td>
-      {{#if_even @index}}
-      {{else}}
-        </tr>
-      {{/if_even}}
-    {{/each}}
-  </table>
-</script>
+  <script id="decks-template" type="text/x-handlebars-template">
+    <table class="decksTable">
+      {{#each decks}}
+        {{#if_even @index}}
+          <tr class="decksRow">
+        {{/if_even}}
+          <td class="decksCell">
+            <span class="cellInterior">
+              <div class="dck {{this._id}}"> 
+                {{this.deckname}}<br>
+              </div>
+                <span class="deckStats">
+                {{this.cards.length}} cards. <br>
+                {{this.cardstoReview}} cards need review.
+
+              <div class="button-container">
+                <button class="edit {{this._id}}">Edit</button>
+                <button class="delete {{this._id}}">Delete</button>
+              </div>
+            </span>
+          </td>
+        {{#if_even @index}}
+        {{else}}
+          </tr>
+        {{/if_even}}
+      {{/each}}
+    </table>
+  </script>
 
 
   <script id="card" type="text/x-handlebars-template">
-  <div class='deckname'>{{deckname}}</div>
+  <div class='headerDeckName'>{{deckname}}</div>
     <div class='crd'>
       <div class='front'>
         {{front}}
@@ -84,17 +85,18 @@
 
   <script id="app" type="text/x-handlebars-template">
     <div class="app">
-    <div class= >
-    <ul class="nav_bar">
-      <li class="nav_item jogly">Jogly</li>
-      <li class="nav_item deck_list">Deck List</li>
-      <li> <a href="/logout" class="nav_item sign_out">Sign Out</a></li>     
-      <li class="nav_item">Contact</li>
-      <li class="nav_item">About</li>
-    </ul>
-    </div>
+      <div class="nav">
+        <ul class="nav_bar">
+          <li class="nav_item jogly">Jogly</li>
+          <li class="nav_item deck_list">Deck List</li>
+          <li class="nav_item">Contact</li>
+          <li class="nav_item">About</li>
+          <li class="right_nav user_name">Hi, Alex Prokop!</li> 
+          <li> <a href="/logout" class="right_nav sign_out">Sign Out</a></li>     
+        </ul>
+      </div>
       <div class="card_container"></div>
-  </div>
+    </div>
   </script>
 
 

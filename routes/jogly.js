@@ -28,6 +28,7 @@ exports.sendMemosWithPopulatedCards = function(req, res){
     .where('_deckid').equals(deckid)
     .populate('_cardid')
     .exec(function(err,memos){
+      console.log(memos);
       res.send(memos);
     });
 };
@@ -61,8 +62,7 @@ exports.updateCard = function(req,res){
   Card.findOneAndUpdate(query, update, function(err, card){
     if (err){ console.log('error updating card') }; 
   })
-
-//TODO: reset intervals, etc to zero.  
+//TODO: reset intervals, etc to zero. 
 };
 
 exports.updateAlgorithmInfo = function(req,res){

@@ -4,6 +4,7 @@ Flshr.IndexView = Backbone.View.extend({
 
   initialize: function(){
     this.decks = new Flshr.Decks();
+    console.log('new decks model created in indexview')
     this.register_helper();
   },
 
@@ -15,6 +16,7 @@ Flshr.IndexView = Backbone.View.extend({
 
   deck_change: function(e){
     var deckID = e.currentTarget.className.split(' ')[1];
+    console.log('fdsafasd')
     this.trigger('deck_render', deckID);
   },
 
@@ -44,8 +46,8 @@ Flshr.IndexView = Backbone.View.extend({
       });
     }
     console.log($('.' + deckId));
-    $('.' + deckId).remove();
-    $('.' + deckId).parent().append('remember our fallen homies');
+    $('.' + deckId).parent().parent().remove();
+    // $('.' + deckId)..append('remember our fallen homies');
   },
 
   startRender: function(){
@@ -58,10 +60,12 @@ Flshr.IndexView = Backbone.View.extend({
     var reviewCrumbs = {};
     for (var i = 0; i < memos.length; i++){
       var memo = memos[i]; 
-      if ( !reviewCrumbs[memo._deckid] ){ reviewCrumbs[memo._deckid] = 0 };
-      var nextReviewDate = new Date(memo.nextDate).setHours(0,0,0,0);
-      var today = new Date().setHours(0,0,0,0);
-      if ( nextReviewDate <= today ){ reviewCrumbs[memo._deckid]++ };
+      if ( !reviewCrumbs[memo._deckid] ){ 
+        reviewCrumbs[memo._deckid] = 0; 
+      }
+      if ( this.needsReview(memo) ){
+       reviewCrumbs[memo._deckid]++;
+      }
     }
     var decks = this.decks.models[0].attributes.decks;
     for (var j = 0; j < decks.length; j++){
@@ -71,6 +75,17 @@ Flshr.IndexView = Backbone.View.extend({
     this.sort_decks(decks);
     this.render();
   },
+
+   needsReview: function(card){
+    var nextReviewDate = card.nextDate;
+    var today = new Date().setHours(0,0,0,0);
+    console.log("heres the memo\n", card, '\n heres today', today, '\n heres the nextdate', card.nextDate )
+    if (nextReviewDate <= today){
+      return true;
+    }
+    return false;
+  },
+
 
 //extend the deck with the cardstoReview property, then sort thems
 

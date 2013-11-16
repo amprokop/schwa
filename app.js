@@ -86,9 +86,7 @@ app.configure( function(){
 mongoose.connect('mongodb://localhost/flshr');
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'there was an error when connecting to mongodb'));
-// db.once('open', function callback(){
-//   console.log('successfully connected to mongo!');
-// });
+
 
 var cardSchema = mongoose.Schema({
   front: String,
@@ -96,13 +94,6 @@ var cardSchema = mongoose.Schema({
   deckname: String,
   URL: String,
   _creator: {type: Schema.Types.ObjectId, ref: 'User'}//,
-  // decks: [{type: Schema.Types.ObjectId, ref: 'Deck'}]
-  //REMOVED FOR NOW: is it necessary for the card to have  a reference to its containing deck?
-  //the problem is--when we make a new card, if we want to save a reference to the deck we would...
-  // first have to find the deck or make a new one, then save its id
-  //THEN make the card
-  //THEN return to the deck and save the card's ID.
-  //...is there a way to streamline this process?
 });
 
 var memoSchema = mongoose.Schema({
@@ -115,7 +106,6 @@ var memoSchema = mongoose.Schema({
   repetitions: Number,
   EF: Number
 });
-//Not used yet----- need to implement user authentication first.
 
 var userSchema = mongoose.Schema({
   firstname: String,

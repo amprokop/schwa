@@ -1,4 +1,4 @@
-//YOU CAN'T EVER REVIEW THE LAST CARD!!
+//TODO: Fix bug--currentCard increments by number of Views?
 
 Flshr.DeckView = Backbone.View.extend({
   model: Flshr.Deck,
@@ -6,20 +6,20 @@ Flshr.DeckView = Backbone.View.extend({
   initialize: function(){
     this.currentCard = 0;
     this.deck = new Flshr.Deck();
+    console.log('new deck in deckview');
   },
 
   events: {
-    "click .ratings" : "gradeCard",
+    "click td.grade" : "gradeCard",
     "click .flipper" : "flip"
   },
 
-
-//separate cards into two groups: needingReview and not 
   startReview: function(){
-    console.log('review started')
+    console.log('dfsuifpbsdai')
     var decks = this.deck.models;
     this.currentCard = 0;
     this.endOfReviewReached = false;
+    this.endOfDeckReached = false;
     this.sortByReviewDate(decks);
   },
 
@@ -34,19 +34,16 @@ Flshr.DeckView = Backbone.View.extend({
   },   
 
   nextCard: function(){
-    if (this.currentCard === this.deck.models.length){
-      this.$el.prepend('<span> End of deck. </span>');
+    if (this.currentCard === this.deck.models.length && !this.endOfDeckReached){
+      this.$el.prepend('<span id="endAddendum"> End of deck. </span>');
+      this.endOfDeckReached = true;
       return;
     }
     var card = this.deck.models[this.currentCard].attributes;
-    if(this.endReached){
-      this.$el.find('.endMessage').remove();
-    }
     if (!this.needsReview(card) && !this.endReached){
       this.$el.prepend('<span class="endMessage"> End of review. Continue or check out your progress!</span>');
       this.endOfReviewReached = true;
     }
-    console.log(this.currentCard)
     this.render(this.currentCard);
     this.currentCard++;
   },
@@ -60,6 +57,7 @@ Flshr.DeckView = Backbone.View.extend({
     var uncompiledTemplate = $('#card').html();
     var template = Handlebars.compile(uncompiledTemplate);
     this.$el.html(template(context));
+    console.log('dbsipjv epil')
     return this;
   },
 

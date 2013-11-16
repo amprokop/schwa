@@ -2,8 +2,8 @@ Flshr.Router = Backbone.Router.extend({
 
   initialize: function(options){
     this.$el = options.el;
-    console.log('router initializing;')
     this.indexView = new Flshr.IndexView({el: this.$el});
+    console.log('index view initialize, deckview initialize in router')
     // this.index();
     this.deckView = new Flshr.DeckView({el: this.$el});
   },
@@ -31,17 +31,15 @@ Flshr.Router = Backbone.Router.extend({
     this.indexView.decks.fetch({
       reset: true,
       success: function(){
-        console.log('fetched!');
         that.indexView.startRender();
       }
     });
-
     this.listenTo(this.indexView, "edit_deck", this.edit);
-    this.listenTo(this.indexView, "deck_render", this.deck);
+    this.listenTo(this.indexView, "deck_render", this.deck);    
   },
 
   deck: function(e){
-    console.log('deck called')
+    console.log('ebgjqiwes')
     this.deckView.deck.url = '/decks/' + e;
     var that = this;
     this.deckView.deck.fetch({

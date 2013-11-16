@@ -4,7 +4,8 @@ var handlebars = require('handlebars');
 var keys = require('.././keys')
 var Shred = require("shred");
 var shred = new Shred();
-var helpers = require('.././helpers')
+var helpers = require('.././helpers');
+var url = require('url');
 
 exports.signIn = function(req,res){
   // res.render('extension-signin');

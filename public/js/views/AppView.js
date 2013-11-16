@@ -20,8 +20,6 @@ var Flshr = Backbone.View.extend({
     this.router = new Flshr.Router({el: this.$el.find('.card_container')});
     Backbone.history.start({pushState: true});
     this.renderIndexView();
-    // this.listenTo(this.indexView, "deck_render", this.deck);
-    // this.listenTo(this.indexView, "edit_deck", this.edit);
   },
 
   render: function(){
@@ -30,29 +28,7 @@ var Flshr = Backbone.View.extend({
     return this;
   },
 
-  // renderDeckView: function(e){
-  //   // this.$cardContainer.empty();
-  //   // this.deckView = new Flshr.DeckView({el: this.$cardContainer, id: e});
-  //   // return this.deckView;
-  //   // e && e.preventDefault();,,kl,uhy
-  //   // this.router.navigate("/deck", {trigger: true});
-
-  // },
-
   renderIndexView: function(){
-    this.router.index();
-      // this.indexView = new Flshr.IndexView({el: this.$cardContainer});
-      // e && e.preventDefault();
-      // console.log('renderIndexView called in appView');
-      // this.listenTo(this.indexView, "edit_deck", this.renderDeckView);
-      
+    this.router.index();      
   }
-
-  // renderEditView: function(e){
-  //   // this.editView = new Flshr.EditView({el: this.$cardContainer, id: e});
-  //   // e && e.preventDefault(); 
-  //   // this.router.navigate("/edi", {trigger: true});
-// }
-
-
 });

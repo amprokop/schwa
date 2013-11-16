@@ -11,7 +11,6 @@
 </head>
 
 
-  <a href="/logout" class="sign_out">Sign Out</a>
 
 
   <script id="edit" type="text/x-handlebars-template">
@@ -37,15 +36,17 @@
         <tr class="decksRow">
       {{/if_even}}
         <td class="decksCell">
-          <span class="dck {{this._id}}"> 
-            {{this.deckname}}<br>
-            <span class="deckStats">
-            {{this.cards.length}} cards. <br>
-            {{this.cardstoReview}} cards need review.
-            </span>
+          <span class="cellInterior">
+            <div class="dck {{this._id}}"> 
+              {{this.deckname}}<br>
+              <span class="deckStats">
+              {{this.cards.length}} cards. <br>
+              {{this.cardstoReview}} cards need review.
+              </span>
+            </div>
+            <div><button class="edit {{this._id}}">Edit</button></div>
+            <div><button class="delete {{this._id}}">Delete</button></div>
           </span>
-          <div><button class="edit {{this._id}}">Edit</button></div>
-          <div><button class="delete {{this._id}}">Delete</button></div>
         </td>
       {{#if_even @index}}
       {{else}}
@@ -69,12 +70,12 @@
       <div class="EF">
         <table class="ratings">
           <tr class="ratings">
-            <td class="zero"></td>
-            <td class="one"></td>
-            <td class="two"></td>
-            <td class="three"></td>
-            <td class="four"></td>
-            <td class="five"></td>
+            <td class="grade zero"></td>
+            <td class="grade one"></td>
+            <td class="grade two"></td>
+            <td class="grade three"></td>
+            <td class="grade four"></td>
+            <td class="grade five"></td>
           </tr>
         </table>
       </div>
@@ -83,9 +84,15 @@
 
   <script id="app" type="text/x-handlebars-template">
     <div class="app">
-      <span class="deck_list">Deck List</span>
-      <span class="current_streak">Current Streak: {{current_streak}}</span>
-      <span class="best_streak">Best Streak:{{best_streak}}</span>
+    <div class= >
+    <ul class="nav_bar">
+      <li class="nav_item jogly">Jogly</li>
+      <li class="nav_item deck_list">Deck List</li>
+      <li> <a href="/logout" class="nav_item sign_out">Sign Out</a></li>     
+      <li class="nav_item">Contact</li>
+      <li class="nav_item">About</li>
+    </ul>
+    </div>
       <div class="card_container"></div>
   </div>
   </script>

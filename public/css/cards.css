@@ -1,8 +1,34 @@
+a {
+  color: white;
+  text-decoration: none;
+}
+
+
+ul {
+  color: white;
+  background-image:url('/public/img/black_denim.png');
+  list-style-type:none;
+  margin:0;
+  padding:0;
+  display: table;
+}
+
+li {
+  margin-right: 20px;
+  display:inline;
+}
+
+.nav_item:hover{
+  margin-right: 23px;
+  color: #00FF00;
+}
+
 body {
+  background-image:url('/public/img/darkdenim3.png');
   font-family: 'Helvetica';
   font-size: 40px;
   font-weight: bold;
-  background-color: black;
+  /*background-color: black;*/
   color: white;
   -webkit-font-smoothing: antialiased;
 }
@@ -21,7 +47,7 @@ body {
   margin-top: 20px;
 }
 
-.card_count, .current_streak, .best_streak, .sound_control, .deck_list {
+.card_count, .current_streak, .best_streak, .sound_controls {
   font-size: 15px;
   margin-left: 300px;
   padding-bottom: 50px
@@ -113,15 +139,60 @@ img {
 
 }
 
-table, td {
+.decksTable {
   margin-right: auto;
-  margin-left: auto;
-  font-size: 60px;
+  margin-left: 0;
+  font-size: 40px;
+  width: 400px;
+  border-spacing:20px;
+  /*border-collapse:collapse;*/
 }
 
-td{
+.decksCell{
+  font-size: 10px;
+  background-image:url('/public/img/white_paperboard.png');
+  margin-bottom: 10px;
+  margin-right: 100px;
+  font-weight: bold;
+  background-color: white;
+  color: #1A1A1A;
+  opacity: .6;
   height: 100px;
   width: 100px;
+}
+
+.decksCell:hover{
+  opacity: 1;
+}
+
+.decksRow, .decksCell {
+  font-size: 30px
+}
+
+.decksCell {
+  height: 10px;
+  width: 100px;
+}
+
+.deckStats {
+  font-size: 15px;
+}
+
+/*.cellInterior{
+  background-color: white;
+  padding-bottom: 20px;
+  padding-right: 20px;
+}
+*/
+
+.ratings{
+  margin-right: auto;
+  margin-left: auto;
+}
+
+.grade{
+  height: 100px;
+  width: 100px;  
 }
 
 .zero{
@@ -148,16 +219,3 @@ background-color: #F86E34;
 background-color: #B21310;
 }
 
-.decksRow, .decksCell {
-  border: 2px solid white;
-  font-size: 30px
-}
-
-.decksCell {
-  height: 10px;
-  width: 100px;
-}
-
-.deckStats {
-  font-size: 15px;
-}

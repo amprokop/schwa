@@ -78,7 +78,7 @@ exports.addNewDeck = function(req,res){
     if (deck){
       res.write('Deck already exists. Don\'t do this to me! Log in to the website to delete.')
     } else {
-      var newDeck = newmongoosedb.Deck({deckname:deckname, defaultLang: defaultLang, autoTranslate: autoTranslate, saveUrl: saveUrl, _creator: req.user._id });
+      var newDeck = new mongoosedb.Deck({deckname:deckname, defaultLang: defaultLang, autoTranslate: autoTranslate, saveUrl: saveUrl, _creator: req.user._id });
       newDeck.save(function(err,deck){
         if (err){
           console.log(err);
@@ -115,7 +115,7 @@ exports.addNewCard = function(req,res){
   var deckId = deckInfo[0];
   var deckname = deckInfo[1];
 //TODO: add _creator to card?
-  var card = newmongoosedb.Card({front: front, back: back, deckname: deckname});
+  var card = new mongoosedb.Card({front: front, back: back, deckname: deckname});
   card.save(function(err, card){
     if (err){vconsole.log(err) };
   });
@@ -123,7 +123,7 @@ exports.addNewCard = function(req,res){
   mongoosedb.Deck.findOne({_id: deckId}, function(err,deck){
     deck.cards.push(card._id);
     deck.save();
-    memo = newmongoosedb.Memo({_cardid: card._id,
+    memo = new mongoosedb.Memo({_cardid: card._id,
                     _userid: req.user._id,
                     _deckid: deck._id,
                     interval: 0,
@@ -147,7 +147,7 @@ exports.addNewCardWithTranslations = function(req,res){
   var front = req.body.front, back = helpers.definitionObjectParser(req.body).join(',\n'), deckId = req.body.deckId, deckname = req.body.deckname;
   console.log(back);
   if (!front){ res.write("Hey! You tried to submit an empty card!"); }
-  var card = newmongoosedb.Card({front: front, back: back, deckname: deckname});
+  var card = new mongoosedb.Card({front: front, back: back, deckname: deckname});
   card.save(function(err, card){
     if (err){ console.log(err);} 
     console.log('card back', card.back);
@@ -156,7 +156,7 @@ exports.addNewCardWithTranslations = function(req,res){
   mongoosedb.Deck.findOne({_id: deckId}, function(err,deck){
     deck.cards.push(card._id);
     deck.save();
-    memo = new Memo({_cardid: card._id,
+    memo = new mongoosedb.Memo({_cardid: card._id,
                     _userid: req.user._id,
                     _deckid: deck._id,
                     interval: 0,

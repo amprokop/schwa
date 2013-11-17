@@ -1,8 +1,30 @@
 {
-  "name":"sink.in",
-  "description":"flashcards",
-  "version":"0.0.1",
+  "name": "sink.in",
+  "description": "flashcards",
+  "version": "0.0.1",
   "dependencies": {
-    "express":"3.x"
-  }
+    "express": "3.x",
+    "consolidate": "~0.9.1",
+    "mongoose": "~3.8.0",
+    "passport": "~0.1.17",
+    "passport-facebook": "~1.0.2",
+    "shred": "~0.8.9",
+    "mquery": "~0.3.3",
+    "request": "~2.27.0",
+    "handlebars": "~1.1.2",
+    "require": "~0.5.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/amprokop/flashcards.git"
+  },
+  "author": "Alex Prokop <alex.prokop@gmail.com>",
+  "scripts": {
+    "start": "node app.js"
+  },
+  "bugs": {
+    "url": "http://github.com/amprokop/flashcards/issues",
+    "email": "alex.prokop@gmail.com"
+  },
+  "license": "MIT"
 }

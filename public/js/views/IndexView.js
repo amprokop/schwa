@@ -4,7 +4,6 @@ Flshr.IndexView = Backbone.View.extend({
 
   initialize: function(){
     this.decks = new Flshr.Decks();
-    console.log('new decks model created in indexview')
     this.register_helper();
   },
 
@@ -80,14 +79,11 @@ Flshr.IndexView = Backbone.View.extend({
     var nextReviewDate = card.nextDate;
     var today = new Date().setHours(0,0,0,0);
     console.log("heres the memo\n", card, '\n heres today', today, '\n heres the nextdate', card.nextDate )
-    if (nextReviewDate <= today){
+    if (nextReviewDate <= today) {
       return true;
     }
     return false;
   },
-
-
-//extend the deck with the cardstoReview property, then sort thems
 
   sort_decks: function(decks){
     function compare(a,b){
@@ -97,7 +93,6 @@ Flshr.IndexView = Backbone.View.extend({
     }
     decks.sort(compare);
   },
-
 
   render: function(){
     this.$el.empty();

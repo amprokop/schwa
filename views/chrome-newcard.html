@@ -5,22 +5,26 @@
 </head>
   <body>
   <a href="/chrome/logout" class="sign_out">Sign Out</a>
-  <a href="/newdeck" class="newDeckButton">New Deck</a>
   <!-- input type="button" id="newDeckButton" value="New Deck"><br -->
   <form id="myForm" method="post">
-    Inspect ya deck:
-    <select name="existingDeck" id="deckChooser">
-      <option value="">Inspect ya deck</option>
-      {{#each decks}}
-      <option value="{{this._id}}%%%{{this.deckname}}"> {{this.deckname}}</option>
-      {{/each}}
-    </select><br>
+  <label>
+    <div>
+      <select name="existingDeck" id="deckChooser">
+        <option value="">Choose a deck</option>
+        {{#each decks}}
+        <option value="{{this._id}}%%%{{this.deckname}}"> {{this.deckname}}</option>
+        {{/each}}
+      </select>
+      <a href="/newdeck" class="newDeckButton">New Deck</a>
+    </div>
+  </label><br>
+
       Front: 
       <input type="text" name="front" value="{{selectedText}}" required><br>
       Back: 
       <input type="text" name="back"/><br>
-      <input type="submit" onclick='this.form.action="/chrome/translate";' value="Translate Word or Short Phrase"><br><br>
-      <input type="submit" onclick='this.form.action="/new_card";' value="Add Card"><br><br>
+      <input class="button" type="submit" onclick='this.form.action="/new_card";' value="Add Card">
+      <input class="button" type="submit" onclick='this.form.action="/chrome/translate";' value="Translate">
   </form>
 </body>
 <script type='text/javascript'>

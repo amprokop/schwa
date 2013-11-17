@@ -6,7 +6,6 @@ Flshr.DeckView = Backbone.View.extend({
   initialize: function(){
     this.currentCard = 0;
     this.deck = new Flshr.Deck();
-    console.log('new deck in deckview');
   },
 
   events: {
@@ -45,7 +44,6 @@ Flshr.DeckView = Backbone.View.extend({
       this.endOfReviewReached = true;
     }
     this.render(this.currentCard);
-    this.currentCard++;
   },
 
   render: function(id){
@@ -57,7 +55,6 @@ Flshr.DeckView = Backbone.View.extend({
     var uncompiledTemplate = $('#card').html();
     var template = Handlebars.compile(uncompiledTemplate);
     this.$el.html(template(context));
-    console.log('dbsipjv epil')
     return this;
   },
 
@@ -71,14 +68,19 @@ Flshr.DeckView = Backbone.View.extend({
   },
 
   gradeCard: function(e){
-    if (!this.needsReview(card)){
-      console.log('card not graded--it doesn\'t need review')
-      this.nextCard();
+    if (!this.deck.models[this.currentCard]){ 
       return;
     }
-    var grade = e.target.className;
-    this.calculateEF(this.currentCard, grade);
-    console.log('card graded');
+    var card = this.deck.models[this.currentCard].attributes;
+    debugger;
+    if (!this.needsReview(card)){
+      console.log('card not graded--it doesn\'t need review!')
+    } else {
+      console.log('')
+      var grade = e.target.className;
+      this.calculateEF(this.currentCard, grade);
+    }
+    this.currentCard++;
     this.nextCard();
   },
 

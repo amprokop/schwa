@@ -1,6 +1,8 @@
 var fs = require('fs');
 var path = require('path');
 var handlebars = require('handlebars');
+var mongoosedb = require('.././mongoosedb');
+
 
 exports.startApp = function(req,res){
   if (!req.user){ res.redirect('/') };
@@ -9,14 +11,14 @@ exports.startApp = function(req,res){
 
 exports.sendCards = function(req, res){
   if (!req.user){ res.redirect('/') };
-  Card.find(function(err, cards){
+  mongoosedb.Card.find(function(err, cards){
     res.send(cards);
   });
 };
 
 exports.sendDecks = function(req, res){
   if (!req.user){ res.redirect('/') };
-  Deck.find(function(err, decks){
+  mongoosedb.Deck.find(function(err, decks){
     res.send(decks);
   });
 };
@@ -24,7 +26,7 @@ exports.sendDecks = function(req, res){
 exports.sendMemosWithPopulatedCards = function(req, res){
   if (!req.user){ res.redirect('/') };
   var deckid = req.params[0];
-  Memo.find({_userid: req.user._id})
+  mongoosedb.Memo.find({_userid: req.user._id})
     .where('_deckid').equals(deckid)
     .populate('_cardid')
     .exec(function(err,memos){
@@ -36,7 +38,7 @@ exports.sendMemosWithPopulatedCards = function(req, res){
 exports.sendDeckToEdit = function(req,res){
   if (!req.user){ res.redirect('/') };
   var deckid = req.params[0];
-  Deck.findOne({_id: deckid})
+  mongoosedb.Deck.findOne({_id: deckid})
     .populate('cards')
     .exec(function(err, deck){
       res.send(deck.cards);
@@ -45,7 +47,7 @@ exports.sendDeckToEdit = function(req,res){
 
 exports.sendUserDecks = function(req, res){
   if (!req.user){ res.redirect('/') };
-  User.findOne({_id: req.user._id})
+  mongoosedb.User.findOne({_id: req.user._id})
     .populate('decks')
     .populate('memos')
     .exec(function(err, user){
@@ -59,7 +61,7 @@ exports.updateCard = function(req,res){
   var query = {"_id" : cardID};
   var update = {front : req.body.front,
                 back : req.body.back};
-  Card.findOneAndUpdate(query, update, function(err, card){
+  mongoosedb.Card.findOneAndUpdate(query, update, function(err, card){
     if (err){ console.log('error updating card') }; 
   })
 //TODO: reset intervals, etc to zero. 
@@ -73,7 +75,7 @@ exports.updateAlgorithmInfo = function(req,res){
                 EF : req.body.EF,
                 nextDate: req.body.nextDate,
                 prevDate: req.body.prevDate};
-  Memo.findOneAndUpdate(query, update, function(err, memo){
+  mongoosedb.Memo.findOneAndUpdate(query, update, function(err, memo){
     if (err){
       console.log('error updating', err);
     } else {
@@ -88,10 +90,10 @@ exports.deleteDeck = function(req, res){
 
   console.log(typeof deckId);
 
-  Deck.findOne({_id : deckId}).remove(function(err, deck){
+  mongoosedb.Deck.findOne({_id : deckId}).remove(function(err, deck){
     if (err){ console.log('deck remove error   ', err) };
   });
-  User.findOne({_id : req.user._id}, function(err, user){
+  mongoosedb.User.findOne({_id : req.user._id}, function(err, user){
     if (err){console.log(err)}; 
     for (var i = 0; i < user.decks.length; i++){
       if (user.decks[i] === deckId){

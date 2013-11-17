@@ -6,6 +6,7 @@ var Shred = require("shred");
 var shred = new Shred();
 var helpers = require('.././helpers');
 var url = require('url');
+var mongoosedb = require('.././mongoosedb')
 
 exports.signIn = function(req,res){
   // res.render('extension-signin');
@@ -20,7 +21,7 @@ exports.logOut = function(req, res){
 
 exports.openNewCardPopup = function(req,res){
   if (!req.user){ res.redirect('/extension-login') };
-  User.findOne({_id: req.user._id})
+  mongoosedb.User.findOne({_id: req.user._id})
   .populate('decks')
   .exec(function(err, user){
     var source = { decks : user.decks };
@@ -33,7 +34,7 @@ exports.openNewCardPopup = function(req,res){
 
 exports.openPopupWithSelectedText = function(req,res){
   if (!req.user){ res.redirect('/extension-login') };
-  User.findOne({_id: req.user._id})
+  mongoosedb.User.findOne({_id: req.user._id})
   .populate('decks')
   .exec(function(err, user){
     var query = url.parse(req.url).query;
@@ -73,18 +74,18 @@ exports.addNewDeck = function(req,res){
   var autoTranslate;
   req.body.urlPref ? saveUrl = true : saveUrl = false;
   req.body.translationPref ? autoTranslate = true : autoTranslate = false;
-  Deck.findOne({deckname: deckname, _creator: req.user._id}, function(err,deck){
+  mongoosedb.Deck.findOne({deckname: deckname, _creator: req.user._id}, function(err,deck){
     if (deck){
       res.write('Deck already exists. Don\'t do this to me! Log in to the website to delete.')
     } else {
-      var newDeck = new Deck({deckname:deckname, defaultLang: defaultLang, autoTranslate: autoTranslate, saveUrl: saveUrl, _creator: req.user._id });
+      var newDeck = newmongoosedb.Deck({deckname:deckname, defaultLang: defaultLang, autoTranslate: autoTranslate, saveUrl: saveUrl, _creator: req.user._id });
       newDeck.save(function(err,deck){
         if (err){
           console.log(err);
         } else {
           console.log(req.user)
           console.log("New deck created with name: " + deck.deckname);
-          User.findOne({_id: req.user._id}, function(err, user){
+         mongoosedb.User.findOne({_id: req.user._id}, function(err, user){
             if (err){
               console.log(err);
             } else {
@@ -114,15 +115,15 @@ exports.addNewCard = function(req,res){
   var deckId = deckInfo[0];
   var deckname = deckInfo[1];
 //TODO: add _creator to card?
-  var card = new Card({front: front, back: back, deckname: deckname});
+  var card = newmongoosedb.Card({front: front, back: back, deckname: deckname});
   card.save(function(err, card){
     if (err){vconsole.log(err) };
   });
 //An async problem may exist here. If the Deck query starts before the Card query returns, card._id will be undefined.
-  Deck.findOne({_id: deckId}, function(err,deck){
+  mongoosedb.Deck.findOne({_id: deckId}, function(err,deck){
     deck.cards.push(card._id);
     deck.save();
-    memo = new Memo({_cardid: card._id,
+    memo = newmongoosedb.Memo({_cardid: card._id,
                     _userid: req.user._id,
                     _deckid: deck._id,
                     interval: 0,
@@ -132,7 +133,7 @@ exports.addNewCard = function(req,res){
                     prevDate: new Date().setHours(0,0,0,0)
                   });
     memo.save(function(err,memo){
-      User.findOne({_id: req.user._id}, function(error, user){
+     mongoosedb.User.findOne({_id: req.user._id}, function(error, user){
         user.memos.push(memo._id);
         user.save();
       });
@@ -146,13 +147,13 @@ exports.addNewCardWithTranslations = function(req,res){
   var front = req.body.front, back = helpers.definitionObjectParser(req.body).join(',\n'), deckId = req.body.deckId, deckname = req.body.deckname;
   console.log(back);
   if (!front){ res.write("Hey! You tried to submit an empty card!"); }
-  var card = new Card({front: front, back: back, deckname: deckname});
+  var card = newmongoosedb.Card({front: front, back: back, deckname: deckname});
   card.save(function(err, card){
     if (err){ console.log(err);} 
     console.log('card back', card.back);
   });
 //An async problem may exist here. If the Deck query starts before the Card query returns, card._id will be undefined.
-  Deck.findOne({_id: deckId}, function(err,deck){
+  mongoosedb.Deck.findOne({_id: deckId}, function(err,deck){
     deck.cards.push(card._id);
     deck.save();
     memo = new Memo({_cardid: card._id,
@@ -165,7 +166,7 @@ exports.addNewCardWithTranslations = function(req,res){
                     prevDate: new Date().setHours(0,0,0,0)
                   });
     memo.save(function(err,memo){
-      User.findOne({_id: req.user._id}, function(error, user){
+     mongoosedb.User.findOne({_id: req.user._id}, function(error, user){
         user.memos.push(memo._id);
         user.save();
       });
@@ -181,7 +182,7 @@ exports.translateInputAndReturnPopup = function(req,res){
   var text = req.body.front;
   console.log("REEEEEQQQreq", req.body);
 
-  Deck.findOne({_id: deckId}, function(err, deck){
+  mongoosedb.Deck.findOne({_id: deckId}, function(err, deck){
     if (err){console.log(err)};
     console.log('\n\n\n\n\n\n\n\n\n\nn\n\n\n\n\n\nnn\n\n\n\n\n\n\n\n\'',deck)
     var lang = deck.defaultLang;

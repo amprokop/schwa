@@ -24,7 +24,6 @@ var handlebars = require('handlebars');
 var consolidate = require('consolidate');
 var path = require('path');
 var passport = require('passport'),
-    GoogleStrategy = require('passport-google').Strategy,
     FacebookStrategy = require('passport-facebook').Strategy;
 var keys = require('./keys.js');
 var Shred = require("shred");

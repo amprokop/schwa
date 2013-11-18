@@ -5,28 +5,28 @@
   <body>
   <a href="/chrome/logout" class="sign_out">Sign Out</a>
   <form id="myForm" method="post" action="/new_card/translated">
-    Deckname: <input type="hidden" name="deckId" value="{{deckId}}">
+    Deckname: 
+    <input type="hidden" name="deckId" value="{{deckId}}">
     <input type="hidden" name="deckname" value="{{deckname}}">
-    {{deckname}}</span>
-    </select><br>
-      Front: 
-      <input type="text" name="front" value="{{front}}" required><br>
-      Back: 
-      <table class="definitionsTable">
-        <tr>
-          <td name="deckname" value="{{deckname}}" ></td> 
-          <td>Translation</td> 
-          <td>Sense</td>
-        </tr> 
-        {{#each translations}}
-          <tr>
-            <td><input class="checkDef" type="checkbox" name="{{@index}}">
-            <td><input class="inputField" type="text" name="term {{@index}}" value="{{this.term}}"></td>
-            <td><input class="inputField" type="text" name="sense {{@index}}" value="{{this.sense}}"></td>
-          </tr>
-        {{/each}}
-      </table>
-      <input type="submit" name="submit" method="post" value="Add Card"><br><br>
+    {{deckname}}<br>
+    Front: 
+    <input type="text" name="front" value="{{front}}" required><br>
+    Back: 
+    <table class="definitionsTable">
+      <tr>
+        <td name="deckname" value="{{deckname}}" ></td> 
+        <td>Translation</td> 
+        <td>Sense</td>
+      </tr> 
+      {{#each translations}}
+      <tr>
+        <td><input class="checkDef" type="checkbox" name="{{@index}}">
+        <td><input class="inputField" type="text" name="term {{@index}}" value="{{this.term}}"></td>
+        <td><input class="inputField" type="text" name="sense {{@index}}" value="{{this.sense}}"></td>
+      </tr>
+      {{/each}}
+    </table>
+    <input type="submit" name="submit" method="post" value="Add Card"><br><br>
   </form>
 </body>
 </html>

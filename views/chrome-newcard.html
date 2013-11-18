@@ -1,13 +1,10 @@
 <html>
 <head>
-<!-- script src="http://code.jquery.com/jquery-1.9.1.js"></script !-->
   <link rel="stylesheet" type="text/css" href="/public/css/extension.css">
 </head>
-  <body>
+<body>
   <a href="/chrome/logout" class="sign_out">Sign Out</a>
-  <!-- input type="button" id="newDeckButton" value="New Deck"><br -->
   <form id="myForm" method="post">
-  <label>
     <div>
       <select name="existingDeck" id="deckChooser" required="required">
         <option >Choose a deck, please</option>
@@ -17,14 +14,12 @@
       </select>
       <a href="/newdeck" class="newDeckButton">New Deck</a>
     </div>
-  </label><br>
-
-      Front: 
-      <input class="inputField" type="text" name="front" value="{{selectedText}}" required><br>
-      Back: 
-      <input class="inputField" type="text" name="back"/><br>
-      <input class="button" type="submit" onclick='this.form.action="/new_card"; window.close();' value="Add Card">
-      <input class="button" type="submit" onclick='this.form.action="/chrome/translate/";' value="Translate">
+    Front: 
+    <input class="inputField" type="text" name="front" value="{{selectedText}}" required><br>
+    Back: 
+    <input class="inputField" type="text" name="back"/><br>
+    <input class="button" type="submit" onclick='this.form.action="/new_card"; window.close();' value="Add Card">
+    <input class="button" type="submit" onclick='this.form.action="/chrome/translate/";' value="Translate">
   </form>
 </body>
 </html>

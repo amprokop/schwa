@@ -6,8 +6,8 @@ exports.authenticateFBUser = function(accessToken, refreshToken, profile, done) 
     if(existingUser){
       done(null, existingUser);
     } else {
-      var newUser = new mongoosedb.User();
-      var account = {provider: "facebook", uid: profile.id};
+      var newUser = new mongoosedb.User(),
+          account = {provider: "facebook", uid: profile.id};
       newUser.accounts.push(account);
       newUser.firstname = profile.name.givenName;
       newUser.lastname = profile.name.familyName;

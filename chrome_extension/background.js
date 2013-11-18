@@ -7,9 +7,9 @@ chrome.contextMenus.onClicked.addListener(onClickHandler);
 
 var contexts = ["page","selection","link","image"];
 for (var i = 0; i < contexts.length; i++) {
-  var context = contexts[i];
-  var title = "Make flash card from " + context;
-  var id = chrome.contextMenus.create({"title": title, "contexts":[context], "id": context});
+  var context = contexts[i],
+      title = "Make flash card from " + context,
+      id = chrome.contextMenus.create({"title": title, "contexts":[context], "id": context});
 }
 
 chrome.browserAction.onClicked.addListener(function(tab) {

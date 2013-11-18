@@ -1,11 +1,12 @@
 <html>
 <head>
-<link rel="stylesheet" type="text/css" href="/public/css/extension.css">
+  <link rel="stylesheet" type="text/css" href="/public/css/extension.css">
 </head>
 <body>
   <form id="newDeckForm" method="post" action="/new_deck">
     <input class="checkDef" type="checkbox" name="urlPref"> Include URL with the flashcard (in development) <br>
-    <input class="checkDef" type="checkbox" name="translationPref"> Automatically search translations of text you select
+    <input class="checkDef" type="checkbox" name="translationPref"> 
+    Automatically search translations of text you select
     <br>
     Default language for this deck:  
     <select name="defaultLanguage" id="langChooser">
@@ -19,8 +20,8 @@
       <option value="zh">Chinese</option>
       <option value="en">Portugese</option>
     </select><br>
-      Deck Name:
-      <input class="inputField" type="text" name="deckName" required><br>
+    Deck Name:
+    <input class="inputField" type="text" name="deckName" required><br>
     <input type="submit" name="submit" value="Save Deck">
   </form> 
 </body>

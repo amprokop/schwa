@@ -25,10 +25,10 @@ exports.openNewCardPopup = function(req,res){
   mongoosedb.User.findOne({_id: req.user._id})
   .populate('decks')
   .exec(function(err, user){
-    var source = { decks : user.decks };
-    var uncompiledTemplate  = fs.readFileSync(path.join('./views/chrome-newcard.html'), "utf8");
-    var template = handlebars.compile(uncompiledTemplate);
-    var populatedTemplate = template(source);
+    var source = { decks : user.decks },
+        uncompiledTemplate  = fs.readFileSync(path.join('./views/chrome-newcard.html'), "utf8"),
+        template = handlebars.compile(uncompiledTemplate),
+        populatedTemplate = template(source);
     res.write(populatedTemplate);
   });
 };
@@ -38,43 +38,36 @@ exports.openPopupWithSelectedText = function(req,res){
   mongoosedb.User.findOne({_id: req.user._id})
   .populate('decks')
   .exec(function(err, user){
-    var query = url.parse(req.url).query;
-    var selectedText = querystring.parse(query).text;
-    var currentUrl = querystring.parse(query).url;
-    var source = {
-      selectedText : selectedText.substring(1,selectedText.length),  
-      decks : user.decks,
-      currentUrl : currentUrl
-      //The URL isn't being stored. Start here to fix that.
-    };
-    var uncompiledTemplate  = fs.readFileSync(path.join('./views/chrome-newcard.html'), "utf8");
-    var template = handlebars.compile(uncompiledTemplate);
-    var populatedTemplate = template(source);
+    var query = url.parse(req.url).query,
+        selectedText = querystring.parse(query).text,
+        currentUrl = querystring.parse(query).url,
+        source = {
+          selectedText : selectedText.substring(1,selectedText.length),  
+          decks : user.decks,
+          currentUrl : currentUrl
+          //TODO: Store URL.
+        },
+        uncompiledTemplate  = fs.readFileSync(path.join('./views/chrome-newcard.html'), "utf8"),
+        template = handlebars.compile(uncompiledTemplate),
+        populatedTemplate = template(source);
     console.log(populatedTemplate);
     res.write(populatedTemplate);
   });
 };
 
 exports.openNewDeckPopup = function(req,res){
-  //add SelectedText in there using querystring
-  //or keep it somewhere?????
   fs.createReadStream(path.join('./views/newdeck.html')).pipe(res);
 };
 
 
-
-
-
-
 exports.addNewDeck = function(req,res){
-  console.log("NEW DECK CALLED");
   if (!req.user){ res.redirect('/extension-login') };
-  var deckname = req.body.deckName;
-  var defaultLang = req.body.defaultLanguage;
-  var saveUrl;
-  var autoTranslate;
-  req.body.urlPref ? saveUrl = true : saveUrl = false;
-  req.body.translationPref ? autoTranslate = true : autoTranslate = false;
+  var deckname = req.body.deckName,
+      defaultLang = req.body.defaultLanguage,
+      saveUrl,
+      autoTranslate;
+  saveUrl = req.body.urlPref ? true : false;
+  autoTranslate = req.body.translationPref ? true : false;
   mongoosedb.Deck.findOne({deckname: deckname, _creator: req.user._id}, function(err,deck){
     if (deck){
       res.write('Deck already exists. Don\'t do this to me! Log in to the website to delete.')
@@ -84,43 +77,24 @@ exports.addNewDeck = function(req,res){
         if (err){
           console.log(err);
         } else {
-          console.log(req.user)
-          console.log("New deck created with name: " + deck.deckname);
-         mongoosedb.User.findOne({_id: req.user._id}, function(err, user){
-            if (err){
-              console.log(err);
-            } else {
-              console.log("Now pushing to the current user " + req.user._id + "s decks");
-              user.decks.push(newDeck._id);
-              console.log(user.decks);
-              user.save(function(err,user){
-                if (err){
-                  console.log(err);
-                }              
-              });
-            }
+          mongoosedb.User.findOne({_id: req.user._id}, function(err, user){
+            user.decks.push(newDeck._id);
+            user.save();
           });
         }
       });
     }
-  });
+  };
   res.redirect('/chrome');
 };
 
-
 exports.addNewCard = function(req,res){
-  if (!req.user){ res.redirect('/extension-login') };
+  if (!req.user) res.redirect('/extension-login');
   var front = req.body.front, back = req.body.back, deckId;
-  if (!front){ res.write("Hey! You tried to submit an empty card!")};
-  var deckInfo = req.body.existingDeck.split("%%%");
-  var deckId = deckInfo[0];
-  var deckname = deckInfo[1];
-//TODO: add _creator to card?
-  var card = new mongoosedb.Card({front: front, back: back, deckname: deckname});
-  card.save(function(err, card){
-    if (err){vconsole.log(err) };
-  });
-//An async problem may exist here. If the Deck query starts before the Card query returns, card._id will be undefined.
+  if (!front) res.write("Hey! You tried to submit an empty card!");
+  var deckInfo = req.body.existingDeck.split("%%%"), deckId = deckInfo[0], deckname = deckInfo[1],
+      card = new mongoosedb.Card({front: front, back: back, deckname: deckname});
+  card.save()
   mongoosedb.Deck.findOne({_id: deckId}, function(err,deck){
     deck.cards.push(card._id);
     deck.save();
@@ -134,7 +108,7 @@ exports.addNewCard = function(req,res){
                     prevDate: new Date().setHours(0,0,0,0)
                   });
     memo.save(function(err,memo){
-     mongoosedb.User.findOne({_id: req.user._id}, function(error, user){
+    mongoosedb.User.findOne({_id: req.user._id}, function(error, user){
         user.memos.push(memo._id);
         user.save();
       });
@@ -146,13 +120,9 @@ exports.addNewCard = function(req,res){
 exports.addNewCardWithTranslations = function(req,res){
   if (!req.user){ res.redirect('/extension-login') };
   var front = req.body.front, back = helpers.definitionObjectParser(req.body).join(',\n'), deckId = req.body.deckId, deckname = req.body.deckname;
-  console.log(back);
   if (!front){ res.write("Hey! You tried to submit an empty card!"); }
   var card = new mongoosedb.Card({front: front, back: back, deckname: deckname});
-  card.save(function(err, card){
-    if (err){ console.log(err);} 
-    console.log('card back', card.back);
-  });
+  card.save();
 //An async problem may exist here. If the Deck query starts before the Card query returns, card._id will be undefined.
   mongoosedb.Deck.findOne({_id: deckId}, function(err,deck){
     deck.cards.push(card._id);
@@ -167,7 +137,7 @@ exports.addNewCardWithTranslations = function(req,res){
                     prevDate: new Date().setHours(0,0,0,0)
                   });
     memo.save(function(err,memo){
-     mongoosedb.User.findOne({_id: req.user._id}, function(error, user){
+      mongoosedb.User.findOne({_id: req.user._id}, function(error, user){
         user.memos.push(memo._id);
         user.save();
       });
@@ -178,20 +148,12 @@ exports.addNewCardWithTranslations = function(req,res){
 };
 
 exports.translateInputAndReturnPopup = function(req,res){
-  var deckname = req.body.existingDeck.split("%%%")[1];
-  var deckId = req.body.existingDeck.split("%%%")[0];
-  var text = req.body.front;
-  console.log("REEEEEQQQreq", req.body);
-
+  var deckname = req.body.existingDeck.split("%%%")[1],
+      deckId = req.body.existingDeck.split("%%%")[0],
+      text = req.body.front;
   mongoosedb.Deck.findOne({_id: deckId}, function(err, deck){
-    if (err){console.log(err)};
-    console.log('\n\n\n\n\n\n\n\n\n\nn\n\n\n\n\n\nnn\n\n\n\n\n\n\n\n\'',deck)
-    var lang = deck.defaultLang;
-    // if (lang === "en"){
-    //   //res.write('The language for this deck is English. Translation is only available from other languages to English. Sorry!');
-    //   return;
-    // };
-    var getTranslationUrl = 'http://api.wordreference.com/0.8/' + keys.wordReference +  '/json/'+ lang + 'en/' + text.split(" ").join("+");
+    var lang = deck.defaultLang,
+        getTranslationUrl = 'http://api.wordreference.com/0.8/' + keys.wordReference +  '/json/'+ lang + 'en/' + text.split(" ").join("+");
     var translationReq = shred.get({
       url: getTranslationUrl,
       headers: {
@@ -199,16 +161,11 @@ exports.translateInputAndReturnPopup = function(req,res){
       },
       on: {
         response: function(response){
-          console.log("wordreferenceresponded:")
-          console.log(response.content.body.toString());
-          var translations = helpers.wordAPIOutputParser(JSON.parse(response.content.body.toString()));
-          console.log('translations\n', translations)
-          var source = { translations : translations, front : text, deckname: deckname, deckId: deckId };
-          console.log('source\n', source);
-          var uncompiledTemplate  = fs.readFileSync(path.join('./views/chrome-translate.html'), "utf8");
-          var template = handlebars.compile(uncompiledTemplate);
-          var populatedTemplate = template(source);
-          console.log(populatedTemplate);
+          var translations = helpers.wordAPIOutputParser(JSON.parse(response.content.body.toString())),
+              source = { translations : translations, front : text, deckname: deckname, deckId: deckId },
+              uncompiledTemplate  = fs.readFileSync(path.join('./views/chrome-translate.html'), "utf8"),
+              template = handlebars.compile(uncompiledTemplate),
+              populatedTemplate = template(source);
           res.write(populatedTemplate);
         }
       }

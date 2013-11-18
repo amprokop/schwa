@@ -1,7 +1,7 @@
-var fs = require('fs');
-var path = require('path');
-var handlebars = require('handlebars');
-var mongoosedb = require('.././mongoosedb');
+var fs = require('fs'),
+    path = require('path'),
+    handlebars = require('handlebars'),
+    mongoosedb = require('.././mongoosedb');
 
 
 exports.startApp = function(req,res){
@@ -52,18 +52,15 @@ exports.sendUserDecks = function(req, res){
     .populate('memos')
     .exec(function(err, user){
         res.send(user);
-//backbone's built in features break here. to make it work again, send user.decks
     });
 };
 
 exports.updateCard = function(req,res){
-  var cardID = req.params[0];
-  var query = {"_id" : cardID};
-  var update = {front : req.body.front,
+  var cardID = req.params[0]
+      query = {"_id" : cardID},
+      update = {front : req.body.front,
                 back : req.body.back};
-  mongoosedb.Card.findOneAndUpdate(query, update, function(err, card){
-    if (err){ console.log('error updating card') }; 
-  })
+  mongoosedb.Card.findOneAndUpdate(query, update);
 //TODO: reset intervals, etc to zero. 
 };
 

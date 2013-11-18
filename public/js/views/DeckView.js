@@ -24,8 +24,8 @@ Schwa.DeckView = Backbone.View.extend({
 
   sortByReviewDate: function(decks){
     var compare = function(a,b){
-      if (a.attributes.nextDate > b.attributes.nextDate){return 1};
-      if (a.attributes.nextDate < b.attributes.nextDate){return -1};
+      if (a.attributes.nextDate > b.attributes.nextDate) return 1;
+      if (a.attributes.nextDate < b.attributes.nextDate) return -1;
       return 0;
     }
     decks.sort(compare);
@@ -68,15 +68,11 @@ Schwa.DeckView = Backbone.View.extend({
   },
 
   gradeCard: function(e){
-    if (!this.deck.models[this.currentCard]){ 
-      return;
-    }
+    if (!this.deck.models[this.currentCard]) return;
     var card = this.deck.models[this.currentCard].attributes;
-    debugger;
     if (!this.needsReview(card)){
-      console.log('card not graded--it doesn\'t need review!')
+      console.log('card not graded--it doesn\'t need review!'
     } else {
-      console.log('')
       var grade = e.target.className;
       this.calculateEF(this.currentCard, grade);
     }
@@ -89,9 +85,7 @@ Schwa.DeckView = Backbone.View.extend({
   },
 
   calculateEF: function (cardID, gradeString) {
-    if (!this.deck.models[cardID]){
-      return;
-    }
+    if (!this.deck.models[cardID]) return;
     var today = new Date().setHours(0,0,0,0);
     var card = this.deck.models[cardID].attributes;
     var oldEF = card.EF,
@@ -150,10 +144,8 @@ Schwa.DeckView = Backbone.View.extend({
     this.deck.models[cardID].attributes = card;
     this.deck.models[cardID].save(null, {
       success: function (model, response){
-        console.log('\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n  card saved\n', model );
       },
       error: function (model, response){
-        console.log('\n\n\n\n\n\n\n\n\n\n\n\n\n\nerror', model );
       }
     });
   }

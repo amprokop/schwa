@@ -4,49 +4,27 @@
 //Presently, your Chrome extension links to localhost:8080 for its popup. Must change in the build! Don't spend hours figuring this out.
 //The extension's logout button is broken. When logging out and signing back in through the extension, you're redirected to the index page
 
+var express = require('express'),
+    routes = require('./routes'),
+    index = require('./routes/index'),
+    auth = require('./routes/auth'),
+    jogly = require('./routes/jogly'),
+    extension = require('./routes/extension'),
+    mongoose = require('mongoose'),
+    Schema = mongoose.Schema,
+    mongoosedb = require('./mongoosedb'),
+    handlebars = require('handlebars'),
+    passport = require('passport'),
+    FacebookStrategy = require('passport-facebook').Strategy,
+    keys = require('./keys.js'),
+    app = express(),
+    port = process.env.PORT || 5000;
+    mongoUri = process.env.MONGOHQ_URL || 'mongodb://localhost/flshr';
+    domain;
 
-var express = require('express');
-var routes = require('./routes');
-var index = require('./routes/index');
-var auth = require('./routes/auth');
-console.log(index);
-var jogly = require('./routes/jogly');
-console.log(jogly);
-var extension = require('./routes/extension');
-console.log(extension);
-var mongoose = require('mongoose'),
-    Schema = mongoose.Schema;
-    mongoosedb = require('./mongoosedb')
-var helpers = require('./helpers');
-var fs = require('fs');
-var url = require('url');
-var querystring = require('querystring');
-var handlebars = require('handlebars');
-var consolidate = require('consolidate');
-var path = require('path');
-var passport = require('passport'),
-    FacebookStrategy = require('passport-facebook').Strategy;
-var keys = require('./keys.js');
-var Shred = require("shred");
-var shred = new Shred();
+domain = process.env.MONGOHQ_URL ? 'http://sink-in.herokuapp.com/' : 'http://localhost:5050/';
 
-var app = express();
-var port = process.env.PORT || 5000;
-var mongoUri = process.env.MONGOLAB_URI ||
-  process.env.MONGOHQ_URL ||
-  'mongodb://localhost/flshr';
-
-
-var domain;
-
-if (process.env.MONGOHQ_URL){
-  domain = 'http://sink-in.herokuapp.com/';
-} else {
-  domain = 'http://localhost:5050/'
-}
-
-
-app.configure( function(){
+app.configure(function(){
   app.use(express.bodyParser());
   app.use(express.cookieParser(keys.facebook));
   app.use(express.cookieSession());
@@ -57,8 +35,6 @@ app.configure( function(){
   app.set('view engine', 'handlebars');
   app.set('view options', {layout: false});
 });
-
-
 
 mongoose.connect(mongoUri);
 var db = mongoose.connection;
@@ -142,10 +118,5 @@ app.post('/new_card/translated', extension.addNewCardWithTranslations)
 app.post('/chrome/translate/', extension.translateInputAndReturnPopup)
 
 
-
-
-
 app.listen(port);
-console.log('This ya boy BIG EXPRESS.JS we listenin on ' + port + ' nahmean?');
-
-
+console.log('This ya boy EXPRESS.JS we listening on ' + port + '!');

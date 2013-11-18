@@ -2,7 +2,7 @@ Schwa.cc
 ==========
 Schwa is a spaced interval flashcard webapp/Chrome extension. 
 
-It was born out of the tedious process I experienced when trying to save flashcards while studying Korean. It went something like this: Highlight the words you want to review later, copy, switch tabs, paste, find translation, copy, paste, sync cards to device...
+It was born out of the tedious process I experienced when trying to save flashcards while studying Korean. The steps involved were something like this: Highlight the words you want to review later, copy, switch tabs, paste, find translation, copy, paste, sync cards to device...
 Schwa does all that in just a few seconds!
 
 Schwa uses the WordReference API to search for definitions, and implements a version of the SuperMemo algorithm originally created by Piotr Wozniak. Spanish, French, Italian, and Portugese translations are currently supported. Chinese, Japanese, Greek, and Korean are coming soon.

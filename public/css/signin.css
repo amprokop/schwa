@@ -1,46 +1,43 @@
 body {
-    color:white;
-    background-image:url('/public/img/darkdenim3.png');
-    text-align: center;
-    font-family: 'Georgia';
-    -webkit-font-smoothing: antialiased;
-    text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
+  color:white;
+  background-image:url('/public/img/darkdenim3.png');
+  text-align: center;
+  font-family: 'Georgia';
+  -webkit-font-smoothing: antialiased;
+  text-shadow: 1px 1px 1px rgba(0,0,0,0.2);
 }
 
 a {
-    color: white;
-    text-decoration: none;
+  color: white;
+  text-decoration: none;
 }
 
 .text-container {
-    margin: auto;
-    text-align: center;
-    padding: 20px;
-    background-color: #222;
-    border: 2px solid white;
-    max-width: 500px;
-    border-radius: 5px;
-
+  margin: auto;
+  text-align: center;
+  padding: 20px;
+  background-color: #222;
+  border: 2px solid white;
+  max-width: 500px;
+  border-radius: 5px;
 }
 
-h1{
-    font-weight: bolder;
-    font-size: 70px;
-
+h1 {
+  font-weight: bolder;
+  font-size: 70px;
 }
 
-h2{
-    line-height: 30%;
+h2 {
+  line-height: 30%;
 }
 
-h5{
-    text-align: left;
-        font-weight: normal;
+h5 {
+  text-align: left;
+  font-weight: normal;
 }
 
 
 .btn-facebook {
-
 
   color: #ffffff;
   text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
@@ -76,4 +73,11 @@ h5{
 .btn-facebook:active,
 .btn-facebook.active {
   background-color: #0d2456 \9;
+}
+
+.attribution, .attribution a {
+  font-size: 13px;
+  color: #999;
+  margin-top: 50px;
+  text-align: left;
 }

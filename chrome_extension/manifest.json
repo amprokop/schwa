@@ -1,12 +1,12 @@
 {
-  "name": "Remindr",
-  "description": "This extension lets users easily create flashcards.",
+  "name": "Schwa",
+  "description": "Dead-simple flashcards.",
   "version": "1.0",
   "manifest_version": 2,
 
   "background": {
     // "page": "background.html",
-    "scripts" : ["background.js", "card_popup.js"]
+    "scripts" : ["background.js"]
   },
 
   "permissions": [
@@ -16,7 +16,8 @@
   ],
 
   "icons" : {
-    "16" : "icon_small.png"
+    "16" : "icon_small.png",
+    "128" : "icon_large.png"
   },
 
   "browser_action" : {

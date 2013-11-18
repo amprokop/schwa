@@ -9,8 +9,8 @@
   <form id="myForm" method="post">
   <label>
     <div>
-      <select name="existingDeck" id="deckChooser">
-        <option >Choose a deck</option>
+      <select name="existingDeck" id="deckChooser" required="required">
+        <option >Choose a deck, please</option>
         {{#each decks}}
         <option value="{{this._id}}%%%{{this.deckname}}"> {{this.deckname}}</option>
         {{/each}}

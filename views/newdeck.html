@@ -4,10 +4,10 @@
 </head>
 <body>
   <form id="newDeckForm" method="post" action="/new_deck">
-    Include URL so you can revisit the page <input type="checkbox" name="urlPref"><br>
-    Automatically search translations of text you select<input type="checkbox" name="translationPref">
+    <input class="checkDef" type="checkbox" name="urlPref"> Include URL with the flashcard (in development) <br>
+    <input class="checkDef" type="checkbox" name="translationPref"> Automatically search translations of text you select
     <br>
-    Are you going to be studying a non-English language?
+    Default language for this deck:  
     <select name="defaultLanguage" id="langChooser">
       <option value="en">English</option>
       <option value="es">Spanish</option>

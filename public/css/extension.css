@@ -1,18 +1,21 @@
 .sign_out {
   font-size: 10px;
+  right: 10px;
   text-decoration: underline;
   color: #777;
 }
 
 a {
-  color: #333;
+  color: #555;
   text-decoration: none;
   font-family: 'Georgia';
 }
 
-body{
-
+.checkDef {
+  width: 50px;
 }
+
+
 
 input {
     border: 3px solid white; 
@@ -35,12 +38,14 @@ input {
 
 .button{
   width: 100px;
+      color: #555;
   background-color: #fff
+  left: 45%;
 }
 
 body {
   background-image: url('/public/img/grilled.png');
-  color: #333;
+  color: #555;
 }
 /*
 body, html {background:#444; text-align:center; padding:50px 0;}*/
@@ -56,7 +61,7 @@ select {
     -moz-box-shadow: 0 3px 0 #ccc, 0 -1px #fff inset;
     box-shadow: 0 3px 0 #ccc, 0 -1px #fff inset;
     background: #f8f8f8;
-    color:#888;
+    color: #555;
     border:none;
     outline:none;
     display: inline-block;
@@ -94,4 +99,4 @@ label:before {
     position:absolute;
     pointer-events:none;
     display:block;
-}s
+}

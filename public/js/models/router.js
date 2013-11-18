@@ -1,4 +1,4 @@
-Flshr.Router = Backbone.Router.extend({
+Schwa.Router = Backbone.Router.extend({
     
   initialize: function(options){
     this.$el = options.el;
@@ -10,7 +10,7 @@ Flshr.Router = Backbone.Router.extend({
   },
 
   cards: function(){
-    var appView = new Flshr.AppView();
+    var appView = new Schwa.AppView();
     this.renderView(appView);
   },
 

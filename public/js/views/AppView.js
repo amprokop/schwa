@@ -1,11 +1,11 @@
-// var Flshr = {};
-// _.extend(Flshr, Backbone.Events);
+// var Schwa = {};
+// _.extend(Schwa, Backbone.Events);
 // vent = _.extend({}, Backbone.Events);
 // vent.on("some:event", function(){
 //   console.log("some event was fired");
 // });
 
-var Flshr = Backbone.View.extend({
+var Schwa = Backbone.View.extend({
 
   events: {
     "click .deck_list" : "renderIndexView",
@@ -17,7 +17,7 @@ var Flshr = Backbone.View.extend({
     var uncompiledTemplate = $('#app').html();
     this.template = Handlebars.compile(uncompiledTemplate);
     $(document.body).append(this.render().el);
-    this.router = new Flshr.Router({el: this.$el.find('.card_container')});
+    this.router = new Schwa.Router({el: this.$el.find('.card_container')});
     Backbone.history.start({pushState: true});
     this.renderIndexView();
   },

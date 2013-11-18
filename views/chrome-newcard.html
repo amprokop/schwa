@@ -10,7 +10,7 @@
   <label>
     <div>
       <select name="existingDeck" id="deckChooser">
-        <option value="">Choose a deck</option>
+        <option >Choose a deck</option>
         {{#each decks}}
         <option value="{{this._id}}%%%{{this.deckname}}"> {{this.deckname}}</option>
         {{/each}}
@@ -20,54 +20,11 @@
   </label><br>
 
       Front: 
-      <input type="text" name="front" value="{{selectedText}}" required><br>
+      <input class="inputField" type="text" name="front" value="{{selectedText}}" required><br>
       Back: 
-      <input type="text" name="back"/><br>
-      <input class="button" type="submit" onclick='this.form.action="/new_card";' value="Add Card">
-      <input class="button" type="submit" onclick='this.form.action="/chrome/translate";' value="Translate">
+      <input class="inputField" type="text" name="back"/><br>
+      <input class="button" type="submit" onclick='this.form.action="/new_card"; window.close();' value="Add Card">
+      <input class="button" type="submit" onclick='this.form.action="/chrome/translate/";' value="Translate">
   </form>
 </body>
-<script type='text/javascript'>
-  var onsubmitform = function() {
-    console.log('called');
-    if (document.pressed === 'translateCard'){
-      document.getElementById('#myform').action = '/chrome/translate/';
-    }
-    if (document.pressed === 'addCard'){
-      document.getElementById('#myform').action = '/newcard/';
-    }
-    return true;
-  }
-</script> 
 </html>
-
-
-<!-- script>
-$(document).ready(function(){
-  $("#newDeckForm").hide();
-  console.log('equigohqg')
-
-  $( "#newDeckButton" ).click(function() {
-    $( "#newCardForm").hide();
-    $( "#newDeckForm" ).toggle( "slow", function() {
-      // Animation complete.
-    });
-  })
-  $('#newDeckSave').click(function() {
-    location.reload(forceGet);
-  });
-});
-</script --!>
-
-
-
-
-
-<!-- ADD HTML5 FORM VALIDATION.   
-  The %%% is a ghetto solution. If a deckname includes %%%, the posting system will break. Find another.
-we need a deckname (no empty string), 
-we need a value for front, 
-and we need some place to store the URL?
-Also, toggle between the new deck and dropdown -->
-
-

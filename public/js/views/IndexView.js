@@ -1,9 +1,9 @@
-Flshr.IndexView = Backbone.View.extend({
+Schwa.IndexView = Backbone.View.extend({
 
-  model: Flshr.Decks,
+  model: Schwa.Decks,
 
   initialize: function(){
-    this.decks = new Flshr.Decks();
+    this.decks = new Schwa.Decks();
     this.register_helper();
   },
 

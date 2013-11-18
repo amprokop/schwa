@@ -1,3 +1,3 @@
-Flshr.Decks = Backbone.Collection.extend({
+Schwa.Decks = Backbone.Collection.extend({
   url: '/user/decks'
 });

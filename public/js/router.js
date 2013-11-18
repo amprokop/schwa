@@ -1,11 +1,11 @@
-Flshr.Router = Backbone.Router.extend({
+Schwa.Router = Backbone.Router.extend({
 
   initialize: function(options){
     this.$el = options.el;
-    this.indexView = new Flshr.IndexView({el: this.$el});
+    this.indexView = new Schwa.IndexView({el: this.$el});
     console.log('index view initialize, deckview initialize in router')
     // this.index();
-    this.deckView = new Flshr.DeckView({el: this.$el});
+    this.deckView = new Schwa.DeckView({el: this.$el});
   },
 
   routes: {

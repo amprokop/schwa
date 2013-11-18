@@ -27,7 +27,9 @@ li {
 .nav {
   /*margin: 0 auto;*/
   width: 100%;
-  float: left;
+  font-weight: normal;
+  font-size: 12px;
+  /*float: left;*/
 /*  margin: 0 0 1em 0;*/
   /*padding: 0;*/
   background-image:url('/public/img/black_denim.png');
@@ -87,6 +89,9 @@ body {
   position: relative;
   top: 15%;
   bottom: 50%;
+}
+
+.user_info {
 }
 
 

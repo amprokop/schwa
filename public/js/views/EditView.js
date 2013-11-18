@@ -1,8 +1,8 @@
-Flshr.EditView = Backbone.View.extend({
-  model: Flshr.Deck,
+Schwa.EditView = Backbone.View.extend({
+  model: Schwa.Deck,
 
   initialize: function(){
-    this.deck = new Flshr.Deck();
+    this.deck = new Schwa.Deck();
     this.deck.url = "/edit" + "/" + this.id;
     var that = this;
     this.deck.fetch({

@@ -152,7 +152,7 @@ app.get('/newdeck', extension.openNewDeckPopup)
 app.post('/new_deck', extension.addNewDeck)
 app.post('/new_card', extension.addNewCard)
 app.post('/new_card/translated', extension.addNewCardWithTranslations)
-app.post('/chrome/translate', extension.translateInputAndReturnPopup)
+app.post('/chrome/translate/', extension.translateInputAndReturnPopup)
 
 
 

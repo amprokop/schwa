@@ -1,11 +1,11 @@
 //TODO: Fix bug--currentCard increments by number of Views?
 
-Flshr.DeckView = Backbone.View.extend({
-  model: Flshr.Deck,
+Schwa.DeckView = Backbone.View.extend({
+  model: Schwa.Deck,
 
   initialize: function(){
     this.currentCard = 0;
-    this.deck = new Flshr.Deck();
+    this.deck = new Schwa.Deck();
   },
 
   events: {

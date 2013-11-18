@@ -1,12 +1,13 @@
-var fs = require('fs');
-var path = require('path');
-var handlebars = require('handlebars');
-var keys = require('.././keys')
-var Shred = require("shred");
-var shred = new Shred();
-var helpers = require('.././helpers');
-var url = require('url');
-var mongoosedb = require('.././mongoosedb')
+var fs = require('fs'),
+    path = require('path'),
+    handlebars = require('handlebars'),
+    keys = require('.././keys'),
+    Shred = require("shred"),
+    shred = new Shred(),
+    helpers = require('.././helpers'),
+    url = require('url'),
+    mongoosedb = require('.././mongoosedb'),
+    querystring = require('querystring');
 
 exports.signIn = function(req,res){
   // res.render('extension-signin');
@@ -139,7 +140,7 @@ exports.addNewCard = function(req,res){
       });
     });
   });
-  res.send(req.body.self);
+  fs.createReadStream(path.join('.' + '/views/close.html')).pipe(res);
 };
 
 exports.addNewCardWithTranslations = function(req,res){
@@ -186,10 +187,10 @@ exports.translateInputAndReturnPopup = function(req,res){
     if (err){console.log(err)};
     console.log('\n\n\n\n\n\n\n\n\n\nn\n\n\n\n\n\nnn\n\n\n\n\n\n\n\n\'',deck)
     var lang = deck.defaultLang;
-    if (lang === "en"){
-      //res.write('The language for this deck is English. Translation is only available from other languages to English. Sorry!');
-      return;
-    };
+    // if (lang === "en"){
+    //   //res.write('The language for this deck is English. Translation is only available from other languages to English. Sorry!');
+    //   return;
+    // };
     var getTranslationUrl = 'http://api.wordreference.com/0.8/' + keys.wordReference +  '/json/'+ lang + 'en/' + text.split(" ").join("+");
     var translationReq = shred.get({
       url: getTranslationUrl,

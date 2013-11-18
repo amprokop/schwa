@@ -20,9 +20,9 @@
         </tr> 
         {{#each translations}}
           <tr>
-            <td><input type="checkbox" name="{{@index}}">
-            <td><input type="text" name="term {{@index}}" value="{{this.term}}"></td>
-            <td><input type="text" name="sense {{@index}}" value="{{this.sense}}"></td>
+            <td><input class="checkDef" type="checkbox" name="{{@index}}">
+            <td><input class="inputField" type="text" name="term {{@index}}" value="{{this.term}}"></td>
+            <td><input class="inputField" type="text" name="sense {{@index}}" value="{{this.sense}}"></td>
           </tr>
         {{/each}}
       </table>

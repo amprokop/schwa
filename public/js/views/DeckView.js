@@ -33,13 +33,13 @@ Schwa.DeckView = Backbone.View.extend({
   },   
 
   nextCard: function(){
-    if (this.currentCard === this.deck.models.length && !this.endOfDeckReached){
+    if (this.currentCard === this.deck.models.length && !this.endOfDeckReached) {
       this.$el.prepend('<span id="endAddendum"> End of deck. </span>');
       this.endOfDeckReached = true;
       return;
     }
     var card = this.deck.models[this.currentCard].attributes;
-    if (!this.needsReview(card) && !this.endReached){
+    if (!this.needsReview(card) && !this.endReached) {
       this.$el.prepend('<span class="endMessage"> End of review. Continue or check out your progress!</span>');
       this.endOfReviewReached = true;
     }
@@ -68,10 +68,12 @@ Schwa.DeckView = Backbone.View.extend({
   },
 
   gradeCard: function(e){
-    if (!this.deck.models[this.currentCard]) return;
+    if (!this.deck.models[this.currentCard]) {
+      return;
+    } 
     var card = this.deck.models[this.currentCard].attributes;
-    if (!this.needsReview(card)){
-      console.log('card not graded--it doesn\'t need review!'
+    if (!this.needsReview(card)) {
+      console.log('card not graded--it doesn\'t need review!')
     } else {
       var grade = e.target.className;
       this.calculateEF(this.currentCard, grade);
@@ -143,10 +145,8 @@ Schwa.DeckView = Backbone.View.extend({
     //calculate when you should review things.
     this.deck.models[cardID].attributes = card;
     this.deck.models[cardID].save(null, {
-      success: function (model, response){
-      },
-      error: function (model, response){
-      }
+      success: function (model, response){},
+      error: function (model, response){}
     });
   }
 

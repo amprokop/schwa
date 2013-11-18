@@ -88,34 +88,34 @@ app.get('/extension/auth/facebook/callback',
 
 //INDEX ROUTES
 
-app.get('/', index.logIn)
-app.get('/logout', index.logOut)
+app.get('/', index.logIn);
+app.get('/logout', index.logOut);
 
 //WEBAPP ROUTES
 
 app.get('/index', jogly.startApp);
-app.get('/deck', jogly.sendCards)
-app.get('/decks', jogly.sendDecks)
-app.get('/decks/*', jogly.sendMemosWithPopulatedCards)
-app.get('/edit/*', jogly.sendDeckToEdit)
-app.get('/user/decks', jogly.sendUserDecks)
-app.post('/edit/card/*', jogly.updateCard)
-//app.post('/edit/deck/*', jogly.updateDeck)
-app.post('/decks/*', jogly.updateAlgorithmInfo)
-app.delete('/delete/deck', jogly.deleteDeck)
-//app.delete('/delete/card', jogly.deleteCard)
+app.get('/deck', jogly.sendCards);
+app.get('/decks', jogly.sendDecks);
+app.get('/decks/*', jogly.sendMemosWithPopulatedCards);
+app.get('/edit/*', jogly.sendDeckToEdit);
+app.get('/user/decks', jogly.sendUserDecks);
+app.post('/edit/card/*', jogly.updateCard);
+//app.post('/edit/deck/*', jogly.updateDeck);
+app.post('/decks/*', jogly.updateAlgorithmInfo);
+app.delete('/delete/deck', jogly.deleteDeck);
+//app.delete('/delete/card', jogly.deleteCard);
 
 //EXTENSION ROUTES
 
-app.get('/extension-login', extension.signIn)
-app.get('/chrome/logout', extension.logOut)
-app.get('/chrome', extension.openNewCardPopup)
-app.get('/chrome/new_card/*', extension.openPopupWithSelectedText)
-app.get('/newdeck', extension.openNewDeckPopup)
-app.post('/new_deck', extension.addNewDeck)
-app.post('/new_card', extension.addNewCard)
-app.post('/new_card/translated', extension.addNewCardWithTranslations)
-app.post('/chrome/translate/', extension.translateInputAndReturnPopup)
+app.get('/extension-login', extension.signIn);
+app.get('/chrome/logout', extension.logOut);
+app.get('/chrome', extension.openNewCardPopup);
+app.get('/chrome/new_card/*', extension.openPopupWithSelectedText);
+app.get('/newdeck', extension.openNewDeckPopup);
+app.post('/new_deck', extension.addNewDeck);
+app.post('/new_card', extension.addNewCard);
+app.post('/new_card/translated', extension.addNewCardWithTranslations);
+app.post('/chrome/translate/', extension.translateInputAndReturnPopup);
 
 
 app.listen(port);

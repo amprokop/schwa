@@ -18,8 +18,8 @@ var express = require('express'),
     FacebookStrategy = require('passport-facebook').Strategy,
     keys = require('./keys.js'),
     app = express(),
-    port = process.env.PORT || 5000;
-    mongoUri = process.env.MONGOHQ_URL || 'mongodb://localhost/flshr';
+    port = process.env.PORT || 5000,
+    mongoUri = process.env.MONGOHQ_URL || 'mongodb://localhost/flshr',
     domain;
 
 domain = process.env.MONGOHQ_URL ? 'http://sink-in.herokuapp.com/' : 'http://localhost:5050/';

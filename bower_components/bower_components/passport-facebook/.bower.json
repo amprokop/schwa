@@ -1,0 +1,15 @@
+{
+  "name": "passport-facebook",
+  "homepage": "https://github.com/jaredhanson/passport-facebook",
+  "version": "1.0.2",
+  "_release": "1.0.2",
+  "_resolution": {
+    "type": "version",
+    "tag": "v1.0.2",
+    "commit": "c2951942d919fb44b0cc76a5e2de136aa09ac577"
+  },
+  "_source": "git://github.com/jaredhanson/passport-facebook.git",
+  "_target": "~1.0.2",
+  "_originalSource": "passport-facebook",
+  "_direct": true
+}

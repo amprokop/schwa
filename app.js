@@ -8,6 +8,7 @@
 var express = require('express');
 var routes = require('./routes');
 var index = require('./routes/index');
+var auth = require('./routes/auth');
 console.log(index);
 var jogly = require('./routes/jogly');
 console.log(jogly);
@@ -33,7 +34,16 @@ var app = express();
 var port = process.env.PORT || 5000;
 var mongoUri = process.env.MONGOLAB_URI ||
   process.env.MONGOHQ_URL ||
-  'mongodb://localhost/mydb';
+  'mongodb://localhost/flshr';
+
+
+var domain;
+
+if (process.env.MONGOHQ_URL){
+  domain = 'http://sink-in.herokuapp.com/';
+} else {
+  domain = 'http://localhost:5050/'
+}
 
 
 app.configure( function(){
@@ -59,29 +69,9 @@ db.on('error', console.error.bind(console, 'there was an error when connecting t
 passport.use(new FacebookStrategy({
     clientID: 751841161508795,
     clientSecret: 'cf5bf14d9607347dcb7f5fe9dee2dc6c',
-    callbackURL: "http://localhost:8080/auth/facebook/callback"
+    callbackURL: domain + 'auth/facebook/callback'
   },
-  function(accessToken, refreshToken, profile, done) {
-
-    mongoosedb.User.findOne({'accounts.uid': profile.id, 'accounts.provider':'facebook'}, function(err, existingUser) {
-      if(existingUser){
-        console.log("Existing user: " + existingUser.firstname + " "  + existingUser.lastname + " found and logged in." );
-        done(null, existingUser);
-      } else {
-        var newUser = new mongoosedb.User();
-        var account = {provider: "facebook", uid: profile.id};
-        newUser.accounts.push(account);
-        newUser.firstname = profile.name.givenName;
-        newUser.lastname = profile.name.familyName;
-        newUser.email = "joe@123fakesite.com";
-        newUser.save(function(err){
-          if(err) {throw err;}
-            console.log('New user: ' + newUser.firstname + ' ' + newUser.lastname + ' created and logged in!');
-            done(null, newUser);
-        });
-      }
-    });
-  }
+  auth.authenticateFBUser
 ));
 
 // passport.use(new GoogleStrategy({

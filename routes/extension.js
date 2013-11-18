@@ -61,7 +61,7 @@ exports.openNewDeckPopup = function(req,res){
 
 
 exports.addNewDeck = function(req,res){
-  if (!req.user){ res.redirect('/extension-login') };
+  if (!req.user) res.redirect('/extension-login');
   var deckname = req.body.deckName,
       defaultLang = req.body.defaultLanguage,
       saveUrl,
@@ -84,7 +84,7 @@ exports.addNewDeck = function(req,res){
         }
       });
     }
-  };
+  });
   res.redirect('/chrome');
 };
 

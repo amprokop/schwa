@@ -1,5 +1,5 @@
 function onClickHandler(info, tab){
-  var postUrl = 'http://localhost:8080/chrome/new_card/card?text='+encodeURIComponent('"'+info.selectionText+'"')+'&url='+info.pageUrl;
+  var postUrl = 'http://sink-in.herokuapp.com/chrome/new_card/card?text='+encodeURIComponent('"'+info.selectionText+'"')+'&url='+info.pageUrl;
   chrome.windows.create({"url":postUrl, "type":"popup", "height":300,"width":600, "top": 100, "left":100});
 }
 
@@ -13,6 +13,6 @@ for (var i = 0; i < contexts.length; i++) {
 }
 
 chrome.browserAction.onClicked.addListener(function(tab) {
-  var postUrl = "http://localhost:8080/chrome/";
+  var postUrl = "http://sink-in.herokuapp.com/chrome/";
   chrome.windows.create({"url":postUrl, "type":"popup", "height":300,"width":600, "top": 100, "left":100});
 });

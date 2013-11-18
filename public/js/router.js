@@ -50,7 +50,7 @@ Schwa.Router = Backbone.Router.extend({
   },
 
   edit: function(e){
-    this.editView = new Flshr.EditView({el: this.$el, id: e});
+    this.editView = new Schwa.EditView({el: this.$el, id: e});
   }
 
 

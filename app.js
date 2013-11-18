@@ -30,13 +30,10 @@ var Shred = require("shred");
 var shred = new Shred();
 
 var app = express();
-
-// app.use(function, req, res, next){
-//   req.db = {};
-  // req.db.tasks = db.collection('tasks')
-// }
-
-// var db = require('./mongoose'); 
+var port = process.env.PORT || 5000;
+var mongoUri = process.env.MONGOLAB_URI ||
+  process.env.MONGOHQ_URL ||
+  'mongodb://localhost/mydb';
 
 
 app.configure( function(){
@@ -52,7 +49,8 @@ app.configure( function(){
 });
 
 
-mongoose.connect('mongodb://localhost/flshr');
+
+mongoose.connect(mongoUri);
 var db = mongoose.connection;
 db.on('error', console.error.bind(console, 'there was an error when connecting to mongodb'));
 
@@ -156,7 +154,8 @@ app.post('/chrome/translate/', extension.translateInputAndReturnPopup)
 
 
 
-app.listen(8080);
-console.log('This ya boy BIG EXPRESS.JS we listenin on 8080 nahmean?');
+
+app.listen(port);
+console.log('This ya boy BIG EXPRESS.JS we listenin on ' + port + ' nahmean?');
 
 

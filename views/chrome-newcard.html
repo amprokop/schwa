@@ -14,10 +14,8 @@
       </select>
       <a href="/newdeck" class="newDeckButton">New Deck</a>
     </div>
-    Front: 
-    <input class="inputField" type="text" name="front" value="{{selectedText}}" required><br>
-    Back: 
-    <input class="inputField" type="text" name="back"/><br>
+    <input class="inputField" type="text" name="front" placeholder="Front" value="{{selectedText}}" required><br>
+    <input class="inputField" type="text" name="back" placeholder="Back"/><br>
     <input class="button" type="submit" onclick='this.form.action="/new_card"; window.close();' value="Add Card">
     <input class="button" type="submit" onclick='this.form.action="/chrome/translate/";' value="Translate">
   </form>

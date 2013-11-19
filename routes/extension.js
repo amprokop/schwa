@@ -39,10 +39,10 @@ exports.openPopupWithSelectedText = function(req,res){
   .populate('decks')
   .exec(function(err, user){
     var query = url.parse(req.url).query,
-        selectedText = querystring.parse(query).text,
+        selectedText = decodeURIComponent(querystring.parse(query).text),
         currentUrl = querystring.parse(query).url,
         source = {
-          selectedText : selectedText.substring(1,selectedText.length),  
+          selectedText : selectedText.substring(1,selectedText.length-1),  
           decks : user.decks,
           currentUrl : currentUrl
           //TODO: Store URL.
@@ -90,7 +90,7 @@ exports.addNewDeck = function(req,res){
 
 exports.addNewCard = function(req,res){
   if (!req.user) res.redirect('/extension-login');
-  var front = req.body.front, back = req.body.back, deckId;
+  var front = encodeURIComponent(req.body.front), back = encodeURIComponent(req.body.back), deckId;
   if (!front) res.write("Hey! You tried to submit an empty card!");
   var deckInfo = req.body.existingDeck.split("%%%"), deckId = deckInfo[0], deckname = deckInfo[1],
       card = new mongoosedb.Card({front: front, back: back, deckname: deckname});
@@ -119,7 +119,7 @@ exports.addNewCard = function(req,res){
 
 exports.addNewCardWithTranslations = function(req,res){
   if (!req.user){ res.redirect('/extension-login') };
-  var front = req.body.front, back = helpers.definitionObjectParser(req.body).join(',\n'), deckId = req.body.deckId, deckname = req.body.deckname;
+  var front = encodeURIComponent(req.body.front), back = encodeURIComponent(helpers.definitionObjectParser(req.body).join(',\n')), deckId = req.body.deckId, deckname = req.body.deckname;
   if (!front){ res.write("Hey! You tried to submit an empty card!"); }
   var card = new mongoosedb.Card({front: front, back: back, deckname: deckname});
   card.save();

@@ -48,7 +48,7 @@ Schwa.DeckView = Backbone.View.extend({
 
   render: function(id){
     console.log('render called');
-    var front = this.deck.models[id].attributes._cardid.front;
+    var front = decodeURIComponent(this.deck.models[id].attributes._cardid.front);
     var back = this.deck.models[id].attributes._cardid.back;
     var deckname = this.deck.models[id].attributes._cardid.deckname;
     var context = {front: front, back: back, deckname:deckname};
@@ -101,13 +101,11 @@ Schwa.DeckView = Backbone.View.extend({
       five : 5
     };
     var grade = gradeNums[gradeString];
-  //default date--if we don't modify it later, we should continue reviewing the card??
 
     if (grade < 3) {
       card.repetitions = 0;
       card.interval = 0;
-      //0 means TODAY
-  //if you can't remember, do it again.
+  //If your grade is less than 0, 
     } else {
       newEF = oldEF + (0.1 - (5-grade)*(0.08+(5-grade)*0.02));
 
@@ -122,15 +120,15 @@ Schwa.DeckView = Backbone.View.extend({
       switch (card.repetitions) {
         case 1:
           card.interval = 1;
-          //if it's your first time, review it tomorrow
+          //If it's your first time, review it tomorrow
           break;
         case 2:
           card.interval = 6;
-          //if it's your second time, review it in six days 
+          //If it's your second time, review it in six days 
           break;
         default:
           card.interval = Math.round((card.repetitions - 1) * card.EF);
-          //we want to round to the day.
+          //We want to round to the day.
           break;
       }
     }

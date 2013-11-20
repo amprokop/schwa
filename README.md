@@ -3,11 +3,27 @@ Schwa.cc
 Schwa is a spaced interval flashcard webapp/Chrome extension. 
 
 It was born out of the tedious process I experienced when trying to make my own flashcards while studying Korean. The steps involved were something like this: Highlight the words you want to review later, copy, switch tabs, paste, find translation, copy, paste, sync cards to device...
-Schwa does all that in just a few seconds!
+Schwa does all that in just a few seconds! 
 
-Schwa uses the WordReference API to search for definitions, and implements a version of the SuperMemo algorithm originally created by Piotr Wozniak. Spanish, French, Italian, and Portugese translations are currently supported. Chinese, Japanese, Greek, and Korean are coming soon.
+The Stack
+
+------------
+
+The server is built with Node.js and uses the Mongoose ORM to interact with a MongoDB database. The front-end uses Backbone.js and Handlebars--a lovely combination, in my opinion!
+
+APIs/Algorithms
+
+---------------
+
+Schwa uses the RESTful WordReference API to search for definitions, and implements a version of the SuperMemo algorithm originally created by Piotr Wozniak. Spanish, French, Italian, and Portugese translations are currently supported. Chinese, Japanese, Greek, and Korean are coming soon.
+The Language Detection API was formerly used to detect the language of incoming text. However, it proved to not be accurate enough to be userful for short words and phrases. C'est la vie. In the future, I might add a feature that autotranslates only if the confidence score is high for a particular language. 
 
 
+Overview/Features
+
+-------------
+
+Highlight some text, right-click, and click translate, adn 
 
 
 To run the webapp locally, just navigate to the root directory and execute "node app.js" from the command line.

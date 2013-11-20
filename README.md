@@ -6,13 +6,11 @@ It was born out of the tedious process I experienced when trying to make my own 
 Schwa does all that in just a few seconds! 
 
 The Stack
-
 _________________
 
 The server is built with Node.js and uses the Mongoose ORM to interact with a MongoDB database. The front-end uses Backbone.js and Handlebars--a lovely combination, in my opinion!
 
 APIs/Algorithms
-
 ________________
 
 Schwa uses the RESTful WordReference API to search for definitions, and implements a version of the SuperMemo algorithm originally created by Piotr Wozniak. Spanish, French, Italian, and Portugese translations are currently supported. Chinese, Japanese, Greek, and Korean are coming soon.

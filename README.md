@@ -19,11 +19,7 @@ Schwa uses the RESTful WordReference API to search for definitions, and implemen
 The Language Detection API was formerly used to detect the language of incoming text. However, it proved to not be accurate enough to be userful for short words and phrases. C'est la vie. In the future, I might add a feature that autotranslates only if the confidence score is high for a particular language. 
 
 
-Overview/Features
 
--------------
-
-Highlight some text, right-click, and click translate, adn 
 
 
 To run the webapp locally, just navigate to the root directory and execute "node app.js" from the command line.
